@@ -4683,6 +4683,10 @@ public interface OdeMessages extends Messages {
   @Description("")
   String DrawCircleMethods();
 
+  @DefaultMessage("DrawSegment")
+  @Description("")
+  String DrawSegmentMethods();
+
   @DefaultMessage("DrawLine")
   @Description("")
   String DrawLineMethods();

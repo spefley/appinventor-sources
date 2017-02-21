@@ -1246,6 +1246,30 @@ public final class Canvas extends AndroidViewComponent implements ComponentConta
     view.invalidate();
   }
 
+ /**
+   */
+  @SimpleFunction
+  public void DrawSegment(
+    float bottom,
+    float left,
+    float right,
+    float top,
+    float startAngle,
+    float sweepAngle,
+    boolean filled
+  ) {
+    // TODO: code will go here
+    float correctedBottom = bottom * $form().deviceDensity();
+    float correctedLeft = left * $form().deviceDensity();
+    float correctedRight = right * $form().deviceDensity();
+    float correctedTop = top * $form().deviceDensity();
+    RectF r = new RectF(correctedLeft, correctedTop, correctedRight, correctedBottom);
+    Paint p = new Paint(paint);
+    p.setStyle(filled ? Paint.Style.FILL : Paint.Style.STROKE);
+    view.canvas.drawArc(r, startAngle, sweepAngle, true, p);
+    view.invalidate();
+  }
+
   /**
    * Draws a line between the given coordinates on the canvas.
    *
@@ -1485,4 +1509,3 @@ public final class Canvas extends AndroidViewComponent implements ComponentConta
     }
   }
 }
-
