@@ -508,6 +508,13 @@ public interface Images extends Resources {
    */
   @Source("com/google/appinventor/images/procedures.png")
   ImageResource procedures();
+
+  /**
+   * Built in drawer item: input/output
+   */
+  @Source("com/google/appinventor/images/inputoutput.png")
+  ImageResource inputOutput();
+
   /**
     * Designer palette item: MediaStore
     */
