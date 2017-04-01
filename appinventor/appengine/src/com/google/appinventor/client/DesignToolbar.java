@@ -1,6 +1,6 @@
 // -*- mode: java; c-basic-offset: 2; -*-
 // Copyright 2009-2011 Google, All Rights reserved
-// Copyright 2011-2012 MIT, All rights reserved
+// Copyright 2011-2017 MIT, All rights reserved
 // Released under the Apache License, Version 2.0
 // http://www.apache.org/licenses/LICENSE-2.0
 
@@ -8,10 +8,7 @@ package com.google.appinventor.client;
 
 import com.google.appinventor.client.editor.FileEditor;
 import com.google.appinventor.client.editor.ProjectEditor;
-import com.google.appinventor.client.editor.youngandroid.BlocklyPanel;
-import com.google.appinventor.client.editor.youngandroid.YaBlocksEditor;
-import com.google.appinventor.client.editor.youngandroid.YaFormEditor;
-import com.google.appinventor.client.editor.youngandroid.YaProjectEditor;
+import com.google.appinventor.client.editor.blocks.BlocklyPanel;
 
 import com.google.appinventor.client.explorer.commands.AddFormCommand;
 import com.google.appinventor.client.explorer.commands.ChainableCommand;
@@ -28,12 +25,12 @@ import com.google.appinventor.client.widgets.Toolbar;
 import com.google.appinventor.common.version.AppInventorFeatures;
 
 import com.google.appinventor.shared.rpc.project.ProjectRootNode;
+import com.google.appinventor.shared.rpc.project.SourceNode;
 import com.google.appinventor.shared.rpc.project.youngandroid.YoungAndroidSourceNode;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.Scheduler;
 
 import com.google.gwt.user.client.Command;
@@ -57,19 +54,25 @@ public class DesignToolbar extends Toolbar {
   private boolean isReadOnly;   // If the UI is in read only mode
 
   /*
-   * A Screen groups together the form editor and blocks editor for an
+   * A EditorPair groups together the designer and blocks editor for an
    * application screen. Name is the name of the screen (form) displayed
    * in the screens pull-down.
    */
-  public static class Screen {
+  public static class EditorPair {
     public final String screenName;
-    public final FileEditor formEditor;
+    public final FileEditor designerEditor;
     public final FileEditor blocksEditor;
 
-    public Screen(String name, FileEditor formEditor, FileEditor blocksEditor) {
+    public EditorPair(String name, FileEditor designerEditor, FileEditor blocksEditor) {
       this.screenName = name;
-      this.formEditor = formEditor;
+      this.designerEditor = designerEditor;
       this.blocksEditor = blocksEditor;
+    }
+  }
+
+  public static class Screen extends EditorPair {
+    public Screen(String name, FileEditor formEditor, FileEditor blocksEditor) {
+      super(name, formEditor, blocksEditor);
     }
   }
 
@@ -117,20 +120,12 @@ public class DesignToolbar extends Toolbar {
   private static final String WIDGET_NAME_SWITCH_TO_BLOCKS_EDITOR = "SwitchToBlocksEditor";
   private static final String WIDGET_NAME_SWITCH_TO_FORM_EDITOR = "SwitchToFormEditor";
 
-  // Switch language
-  private static final String WIDGET_NAME_SWITCH_LANGUAGE = "Language";
-  private static final String WIDGET_NAME_SWITCH_LANGUAGE_ENGLISH = "English";
-  private static final String WIDGET_NAME_SWITCH_LANGUAGE_CHINESE_CN = "Simplified Chinese";
-  private static final String WIDGET_NAME_SWITCH_LANGUAGE_SPANISH_ES = "Spanish-Spain";
-  //private static final String WIDGET_NAME_SWITCH_LANGUAGE_GERMAN = "German";
-  //private static final String WIDGET_NAME_SWITCH_LANGUAGE_VIETNAMESE = "Vietnamese";
-
   // Enum for type of view showing in the design tab
   public enum View {
-    FORM,   // Form editor view
+    DESIGNER,   // Designer editor view
     BLOCKS  // Blocks editor view
   }
-  public View currentView = View.FORM;
+  public View currentView = View.DESIGNER;
 
   public Label projectNameLabel;
 
@@ -186,7 +181,15 @@ public class DesignToolbar extends Toolbar {
     Ode.getInstance().getTopToolbar().updateFileMenuButtons(0);
   }
 
-  private class AddFormAction implements Command {
+  private class AddAction implements Command {
+    private final String tracking;
+    private final ChainableCommand command;
+
+    AddAction(String tracking, ChainableCommand command) {
+      this.tracking = tracking;
+      this.command = command;
+    }
+
     @Override
     public void execute() {
       Ode ode = Ode.getInstance();
@@ -198,8 +201,7 @@ public class DesignToolbar extends Toolbar {
         Runnable doSwitch = new Runnable() {
             @Override
             public void run() {
-              ChainableCommand cmd = new AddFormCommand();
-              cmd.startExecuteChain(Tracking.PROJECT_ACTION_ADDFORM_YA, projectRootNode);
+              command.startExecuteChain(tracking, projectRootNode);
             }
           };
         // take a screenshot of the current blocks if we are in the blocks editor
@@ -209,6 +211,12 @@ public class DesignToolbar extends Toolbar {
           doSwitch.run();
         }
       }
+    }
+  }
+
+  private class AddFormAction extends AddAction {
+    AddFormAction() {
+      super(Tracking.PROJECT_ACTION_ADDFORM_YA, new AddFormCommand());
     }
   }
 
@@ -308,12 +316,12 @@ public class DesignToolbar extends Toolbar {
     }
     currentView = view;
     Screen screen = currentProject.screens.get(newScreenName);
-    ProjectEditor projectEditor = screen.formEditor.getProjectEditor();
+    ProjectEditor projectEditor = screen.designerEditor.getProjectEditor();
     currentProject.setCurrentScreen(newScreenName);
     setDropDownButtonCaption(WIDGET_NAME_SCREENS_DROPDOWN, newScreenName);
     OdeLog.log("Setting currentScreen to " + newScreenName);
-    if (currentView == View.FORM) {
-      projectEditor.selectFileEditor(screen.formEditor);
+    if (currentView == View.DESIGNER) {
+      projectEditor.selectFileEditor(screen.designerEditor);
       toggleEditor(false);
       Ode.getInstance().getTopToolbar().updateFileMenuButtons(1);
     } else {  // must be View.BLOCKS
@@ -351,13 +359,13 @@ public class DesignToolbar extends Toolbar {
             + "Ignoring SwitchToFormEditorAction.execute().");
         return;
       }
-      if (currentView != View.FORM) {
+      if (currentView != View.DESIGNER) {
         // We are leaving a blocks editor, so take a screenshot
         Ode.getInstance().screenShotMaybe(new Runnable() {
             @Override
             public void run() {
               long projectId = Ode.getInstance().getCurrentYoungAndroidProjectRootNode().getProjectId();
-              switchToScreen(projectId, currentProject.currentScreen, View.FORM);
+              switchToScreen(projectId, currentProject.currentScreen, View.DESIGNER);
               toggleEditor(false);      // Gray out the Designer button and enable the blocks button
               Ode.getInstance().getTopToolbar().updateFileMenuButtons(1);
             }
@@ -409,7 +417,7 @@ public class DesignToolbar extends Toolbar {
 
   /*
    * Add a screen name to the drop-down for the project with id projectId.
-   * name is the form name, formEditor is the file editor for the form UI,
+   * name is the form name, designerEditor is the file editor for the form UI,
    * and blocksEditor is the file editor for the form's blocks.
    */
   public void addScreen(long projectId, String name, FileEditor formEditor,
@@ -490,7 +498,7 @@ public class DesignToolbar extends Toolbar {
       if (currentProject.currentScreen.equals(name)) {
         // TODO(sharon): maybe make a better choice than screen1, but for now
         // switch to screen1 because we know it is always there
-        switchToScreen(projectId, YoungAndroidSourceNode.SCREEN1_FORM_NAME, View.FORM);
+        switchToScreen(projectId, YoungAndroidSourceNode.SCREEN1_FORM_NAME, View.DESIGNER);
       }
       removeDropDownButtonItem(WIDGET_NAME_SCREENS_DROPDOWN, name);
     }
@@ -502,7 +510,7 @@ public class DesignToolbar extends Toolbar {
     setButtonEnabled(WIDGET_NAME_SWITCH_TO_FORM_EDITOR, blocks);
 
     if (AppInventorFeatures.allowMultiScreenApplications() && !isReadOnly) {
-      if (getCurrentProject() == null || getCurrentProject().currentScreen == "Screen1") {
+      if (getCurrentProject() == null || "Screen1".equals(getCurrentProject().currentScreen)) {
         setButtonEnabled(WIDGET_NAME_REMOVEFORM, false);
       } else {
         setButtonEnabled(WIDGET_NAME_REMOVEFORM, true);

@@ -239,7 +239,7 @@ public final class AddFormCommand extends ChainableCommand {
                 long projectId = formEditor.getProjectId();
                 designToolbar.addScreen(projectId, formName, formEditor, 
                     blocksEditor);
-                designToolbar.switchToScreen(projectId, formName, DesignToolbar.View.FORM);
+                designToolbar.switchToScreen(projectId, formName, DesignToolbar.View.DESIGNER);
                 executeNextCommand(projectRootNode);
               } else {
                 // The form editor and/or blocks editor is still not there. Try again later.

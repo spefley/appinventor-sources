@@ -1,6 +1,6 @@
 // -*- mode: java; c-basic-offset: 2; -*-
 // Copyright 2009-2011 Google, All Rights reserved
-// Copyright 2011-2012 MIT, All rights reserved
+// Copyright 2011-2017 MIT, All rights reserved
 // Released under the Apache License, Version 2.0
 // http://www.apache.org/licenses/LICENSE-2.0
 
@@ -10,9 +10,11 @@ import com.google.appinventor.client.Ode;
 import com.google.appinventor.client.explorer.project.Project;
 import com.google.appinventor.client.output.OdeLog;
 import com.google.appinventor.client.settings.Settings;
+import com.google.appinventor.shared.rpc.project.SourceNode;
 import com.google.appinventor.shared.settings.SettingsConstants;
 import com.google.appinventor.client.settings.project.ProjectSettings;
 import com.google.appinventor.shared.rpc.project.ProjectRootNode;
+import com.google.appinventor.shared.storage.StorageUtil;
 import com.google.common.collect.Maps;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DeckPanel;
@@ -46,6 +48,7 @@ public abstract class ProjectEditor extends Composite {
   // is non-null, it is one of the file editors in openFileEditors and the 
   // one currently showing in deckPanel. 
   private final Map<String, FileEditor> openFileEditors;
+  private final Map<String, Map<String, FileEditor>> editorsByType;
   protected final List<String> fileIds; 
   private final HashMap<String,String> locationHashMap = new HashMap<String,String>();
   private final DeckPanel deckPanel;
@@ -63,6 +66,7 @@ public abstract class ProjectEditor extends Composite {
 
     openFileEditors = Maps.newHashMap();
     fileIds = new ArrayList<String>();
+    editorsByType = Maps.newHashMap();
 
     deckPanel = new DeckPanel();
 
@@ -110,6 +114,15 @@ public abstract class ProjectEditor extends Composite {
     fileIds.add(fileId);
     
     deckPanel.add(fileEditor);
+
+    String entityName = SourceNode.getEntityName(fileEditor.getFileId());
+    if (!editorsByType.containsKey(entityName)) {
+      Map<String, FileEditor> editorMap = new HashMap<>();
+      editorMap.put(fileEditor.getEditorType(), fileEditor);
+      editorsByType.put(entityName, editorMap);
+    } else {
+      editorsByType.get(entityName).put(fileEditor.getEditorType(), fileEditor);
+    }
   }
 
   /**
@@ -170,6 +183,22 @@ public abstract class ProjectEditor extends Composite {
    */
   public final FileEditor getFileEditor(String fileId) {
     return openFileEditors.get(fileId);
+  }
+
+  /**
+   * Get the file editor of the given <code>editorType</code>, if any, for <code>entityName</code>.
+   *
+   * @param entityName
+   * @param editorType
+   * @return
+   */
+  public final FileEditor getFileEditor(String entityName, String editorType) {
+    Map<String, FileEditor> entityEditors = editorsByType.get(entityName);
+    if (entityEditors != null) {
+      return entityEditors.get(editorType);
+    } else {
+      return null;
+    }
   }
   
   /**
@@ -257,7 +286,7 @@ public abstract class ProjectEditor extends Composite {
    * this code.
    *
    * @param componentName The name of the component registering location permission
-   * @param newVlue either "True" or "False" indicating whether permission is need.
+   * @param newValue either "True" or "False" indicating whether permission is need.
    */
 
   public final void recordLocationSetting(String componentName, String newValue) {

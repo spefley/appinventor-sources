@@ -107,6 +107,15 @@ Blockly.ComponentDatabase = function() {
   this.i18nMethodNames_ = {};
   this.i18nParamNames_ = {};
   this.i18nPropertyNames_ = {};
+
+  /**
+   * Function to convert the target language types into Blockly types.
+   * @param type
+   * @param direction
+   */
+  this.typeMappingFunction = function(type, direction) {
+    throw new Error('Method must be set on database creation.');
+  };
 };
 
 /**

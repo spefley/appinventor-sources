@@ -7,6 +7,7 @@
 package com.google.appinventor.client.editor.simple.components.utils;
 
 import com.google.appinventor.client.ComponentsTranslation;
+import com.google.appinventor.client.editor.designer.DesignerEditor;
 import com.google.appinventor.client.editor.simple.components.MockForm;
 import com.google.appinventor.client.editor.simple.components.MockComponent;
 import com.google.appinventor.client.editor.youngandroid.YaFormEditor;
@@ -84,7 +85,7 @@ public class PropertiesUtil {
    * @param propertyDefintions
    */
   public static void populateProperties(MockComponent mockComponent, List<ComponentDatabaseInterface.PropertyDefinition> propertyDefintions,
-                                        YaFormEditor editor) {
+                                        DesignerEditor editor) {
 
     String componentType = mockComponent.getType();
     // Configure properties
@@ -166,7 +167,7 @@ public class PropertiesUtil {
   /*
    * Creates a new property editor.
    */
-  public static PropertyEditor createPropertyEditor(String editorType, YaFormEditor editor) {
+  public static PropertyEditor createPropertyEditor(String editorType, DesignerEditor editor) {
     if (editorType.equals(PropertyTypeConstants.PROPERTY_TYPE_HORIZONTAL_ALIGNMENT)) {
       return new YoungAndroidHorizontalAlignmentChoicePropertyEditor();
     } else if (editorType.equals(PropertyTypeConstants.PROPERTY_TYPE_VERTICAL_ALIGNMENT)) {

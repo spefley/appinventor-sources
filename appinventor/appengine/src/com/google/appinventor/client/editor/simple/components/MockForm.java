@@ -1,6 +1,6 @@
 // -*- mode: java; c-basic-offset: 2; -*-
 // Copyright 2009-2011 Google, All Rights reserved
-// Copyright 2011-2012 MIT, All rights reserved
+// Copyright 2011-2017 MIT, All rights reserved
 // Released under the Apache License, Version 2.0
 // http://www.apache.org/licenses/LICENSE-2.0
 
@@ -13,8 +13,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import com.google.appinventor.client.editor.designer.DesignerChangeListener;
+import com.google.appinventor.client.editor.designer.DesignerRootComponent;
 import com.google.appinventor.client.editor.simple.SimpleEditor;
 import com.google.appinventor.client.editor.simple.components.utils.PropertiesUtil;
+import com.google.appinventor.client.editor.youngandroid.YaVisibleComponentsPanel;
 import com.google.appinventor.client.editor.youngandroid.properties.YoungAndroidLengthPropertyEditor;
 import com.google.appinventor.client.editor.youngandroid.properties.YoungAndroidVerticalAlignmentChoicePropertyEditor;
 import com.google.appinventor.client.output.OdeLog;
@@ -44,7 +47,7 @@ import com.google.gwt.user.client.ui.TreeItem;
  * Normal size is a 1:1 with pixels on a device with dpi:160. We use that as the baseline for the
  * browser too. All UI elements should be scaled to DP for buckets other than 'normal'.
  */
-public final class MockForm extends MockContainer {
+public final class MockForm extends MockDesignerRoot implements DesignerRootComponent {
 
   /*
    * Widget for the mock form title bar.
@@ -182,14 +185,10 @@ public final class MockForm extends MockContainer {
   AbsolutePanel formWidget;
   ScrollPanel scrollPanel;
   private TitleBar titleBar;
-  private MockComponent selectedComponent;
 
   int screenWidth;              // TEMP: Make package visible so we can use it MockHVLayoutBase
   private int screenHeight;
   int usableScreenHeight;       // TEMP: Make package visible so we can use it MockHVLayoutBase
-
-  // Set of listeners for any changes of the form
-  final HashSet<FormChangeListener> formChangeListeners = new HashSet<FormChangeListener>();
 
   // Don't access the verticalScrollbarWidth field directly. Use getVerticalScrollbarWidth().
   private static int verticalScrollbarWidth;
@@ -683,108 +682,6 @@ public final class MockForm extends MockContainer {
     layoutInfo.gatherDimensions();
   }
 
-  /**
-   * Adds an {@link FormChangeListener} to the listener set if it isn't already in there.
-   *
-   * @param listener  the {@code FormChangeListener} to be added
-   */
-  public void addFormChangeListener(FormChangeListener listener) {
-    formChangeListeners.add(listener);
-  }
-
-  /**
-   * Removes an {@link FormChangeListener} from the listener list.
-   *
-   * @param listener  the {@code FormChangeListener} to be removed
-   */
-  public void removeFormChangeListener(FormChangeListener listener) {
-    formChangeListeners.remove(listener);
-  }
-
-  /**
-   * Triggers a component property change event to be sent to the listener on the listener list.
-   */
-  protected void fireComponentPropertyChanged(MockComponent component,
-      String propertyName, String propertyValue) {
-    for (FormChangeListener listener : formChangeListeners) {
-      listener.onComponentPropertyChanged(component, propertyName, propertyValue);
-    }
-  }
-
-  /**
-   * Triggers a component removed event to be sent to the listener on the listener list.
-   */
-  protected void fireComponentRemoved(MockComponent component, boolean permanentlyDeleted) {
-    for (FormChangeListener listener : formChangeListeners) {
-      listener.onComponentRemoved(component, permanentlyDeleted);
-    }
-  }
-
-  /**
-   * Triggers a component added event to be sent to the listener on the listener list.
-   */
-  protected void fireComponentAdded(MockComponent component) {
-    for (FormChangeListener listener : formChangeListeners) {
-      listener.onComponentAdded(component);
-    }
-  }
-
-  /**
-   * Triggers a component renamed event to be sent to the listener on the listener list.
-   */
-  protected void fireComponentRenamed(MockComponent component, String oldName) {
-    for (FormChangeListener listener : formChangeListeners) {
-      listener.onComponentRenamed(component, oldName);
-    }
-  }
-
-  /**
-   * Triggers a component selection change event to be sent to the listener on the listener list.
-   */
-  protected void fireComponentSelectionChange(MockComponent component, boolean selected) {
-    for (FormChangeListener listener : formChangeListeners) {
-      listener.onComponentSelectionChange(component, selected);
-    }
-  }
-
-  /**
-   * Changes the component that is currently selected in the form.
-   * <p>
-   * There will always be exactly one component selected in a form
-   * at any given time.
-   */
-  public final void setSelectedComponent(MockComponent newSelectedComponent) {
-    MockComponent oldSelectedComponent = selectedComponent;
-
-    if (newSelectedComponent == null) {
-      throw new IllegalArgumentException("at least one component must always be selected");
-    }
-    if (newSelectedComponent == oldSelectedComponent) {
-      return;
-    }
-
-    selectedComponent = newSelectedComponent;
-
-    if (oldSelectedComponent != null) {     // Can be null initially
-      oldSelectedComponent.onSelectedChange(false);
-    }
-    newSelectedComponent.onSelectedChange(true);
-  }
-
-  public final MockComponent getSelectedComponent() {
-    return selectedComponent;
-  }
-
-  /**
-   * Builds a tree of the component hierarchy of the form for display in the
-   * {@code SourceStructureExplorer}.
-   *
-   * @return  tree showing the component hierarchy of the form
-   */
-  public TreeItem buildComponentsTree() {
-    return buildTree();
-  }
-
   // PropertyChangeListener implementation
 
   @Override
@@ -805,10 +702,10 @@ public final class MockForm extends MockContainer {
       titleBar.changeTitle(newValue);
     } else if (propertyName.equals(PROPERTY_NAME_SIZING)) {
       if (newValue.equals("Fixed")){ // Disable Tablet Preview
-        editor.getVisibleComponentsPanel().enableTabletPreviewCheckBox(false);
+        ((YaVisibleComponentsPanel) editor.getVisibleComponentsPanel()).enableTabletPreviewCheckBox(false);
       }
       else {
-        editor.getVisibleComponentsPanel().enableTabletPreviewCheckBox(true);
+        ((YaVisibleComponentsPanel) editor.getVisibleComponentsPanel()).enableTabletPreviewCheckBox(true);
       }
       setSizingProperty(newValue);
     } else if (propertyName.equals(PROPERTY_NAME_ICON)) {

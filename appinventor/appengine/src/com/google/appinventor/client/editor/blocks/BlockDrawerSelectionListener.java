@@ -1,6 +1,7 @@
-// Copyright 2012 Massachusetts Institute of Technology. All Rights Reserved.
+// -*- mode: java; c-basic-offset: 2; -*-
+// Copyright 2012-2017 Massachusetts Institute of Technology. All Rights Reserved.
 
-package com.google.appinventor.client.editor.youngandroid;
+package com.google.appinventor.client.editor.blocks;
 
 /**
  * Interface for receiving notifications about clicks on items in

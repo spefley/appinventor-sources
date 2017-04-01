@@ -8,6 +8,8 @@ package com.google.appinventor.client.editor.simple.components;
 
 import static com.google.appinventor.client.Ode.MESSAGES;
 
+import com.google.appinventor.client.editor.blocks.BlocksEditor;
+import com.google.appinventor.client.editor.designer.DesignerRootComponent;
 import com.google.appinventor.client.editor.simple.SimpleComponentDatabase;
 import com.google.appinventor.client.ComponentsTranslation;
 import com.google.appinventor.client.Images;
@@ -160,7 +162,7 @@ public abstract class MockComponent extends Composite implements PropertyChangeL
         hide();
         String oldName = getName();
         changeProperty(PROPERTY_NAME_NAME, newName);
-        getForm().fireComponentRenamed(MockComponent.this, oldName);
+        getRoot().fireComponentRenamed(MockComponent.this, oldName);
       } else {
         newNameTextBox.setFocus(true);
         newNameTextBox.selectAll();
@@ -213,7 +215,7 @@ public abstract class MockComponent extends Composite implements PropertyChangeL
   }
 
   // Component database: information about components (including their properties and events)
-  private final SimpleComponentDatabase COMPONENT_DATABASE;
+  private final ComponentDatabaseInterface COMPONENT_DATABASE;
 
   // Image bundle
   protected static final Images images = Ode.getImageBundle();
@@ -257,16 +259,16 @@ public abstract class MockComponent extends Composite implements PropertyChangeL
     this.editor = editor;
     this.type = type;
     this.iconImage = iconImage;
-    COMPONENT_DATABASE = SimpleComponentDatabase.getInstance(editor.getProjectId());
+    COMPONENT_DATABASE = editor.getComponentDatabase();
     componentDefinition = COMPONENT_DATABASE.getComponentDefinition(type);
 
     sourceStructureExplorerItem = new SourceStructureExplorerItem() {
       @Override
       public void onSelected() {
         // are we showing the blocks editor? if so, toggle the component drawer
-        if (Ode.getInstance().getCurrentFileEditor() instanceof YaBlocksEditor) {
-          YaBlocksEditor blocksEditor =
-              (YaBlocksEditor) Ode.getInstance().getCurrentFileEditor();
+        if (Ode.getInstance().getCurrentFileEditor() instanceof BlocksEditor) {
+          BlocksEditor<?, ?> blocksEditor =
+              (BlocksEditor<?, ?>) Ode.getInstance().getCurrentFileEditor();
           OdeLog.log("Showing item " + getName());
           blocksEditor.showComponentBlocks(getName());
         } else {
@@ -284,24 +286,24 @@ public abstract class MockComponent extends Composite implements PropertyChangeL
 
       @Override
       public boolean canRename() {
-        return !isForm();
+        return !isRoot();
       }
 
       @Override
       public void rename() {
-        if (!isForm()) {
+        if (!isRoot()) {
           new RenameDialog(getName()).center();
         }
       }
 
       @Override
       public boolean canDelete() {
-        return !isForm();
+        return !isRoot();
       }
 
       @Override
       public void delete() {
-        if (!isForm()) {
+        if (!isRoot()) {
           if (Window.confirm(MESSAGES.reallyDeleteComponent())) {
             MockComponent.this.delete();
           }
@@ -318,7 +320,7 @@ public abstract class MockComponent extends Composite implements PropertyChangeL
     properties.addPropertyChangeListener(this);
 
     // Allow dragging this component in a drag-and-drop action if this is not the root form
-    if (!isForm()) {
+    if (!isRoot()) {
       dragSourceSupport = new DragSourceSupport(this);
       addMouseListener(dragSourceSupport);
     }
@@ -570,7 +572,15 @@ public abstract class MockComponent extends Composite implements PropertyChangeL
     return getContainer().getForm();
   }
 
+  public DesignerRootComponent getRoot() {
+    return getContainer().getRoot();
+  }
+
   public boolean isForm() {
+    return false;
+  }
+
+  public boolean isRoot() {
     return false;
   }
 
@@ -588,7 +598,7 @@ public abstract class MockComponent extends Composite implements PropertyChangeL
    * Selects this component in the visual editor.
    */
   public final void select() {
-    getForm().setSelectedComponent(this);
+    getRoot().setSelectedComponent(this);
   }
 
   /**
@@ -605,14 +615,14 @@ public abstract class MockComponent extends Composite implements PropertyChangeL
     } else {
       removeStyleDependentName("selected");
     }
-    getForm().fireComponentSelectionChange(this, selected);
+    getRoot().fireComponentSelectionChange(this, selected);
   }
 
   /**
    * Returns whether this component is selected.
    */
   public boolean isSelected() {
-    return (getForm().getSelectedComponent() == this);
+    return (getRoot().getSelectedComponent() == this);
   }
 
   /**
@@ -850,7 +860,7 @@ public abstract class MockComponent extends Composite implements PropertyChangeL
 
   @Override
   public DropTarget[] getDropTargets() {
-    final List<DropTarget> targetsWithinForm = getForm().getDropTargetsWithin();
+    final List<DropTarget> targetsWithinForm = getRoot().getDropTargetsWithin();
     return targetsWithinForm.toArray(new DropTarget[targetsWithinForm.size()]);
   }
 
@@ -964,7 +974,7 @@ public abstract class MockComponent extends Composite implements PropertyChangeL
        * the palette. We need to explicitly trigger on Form here, because forms
        * are not in containers.
        */
-      getForm().fireComponentPropertyChanged(this, propertyName, newValue);
+      getRoot().fireComponentPropertyChanged(this, propertyName, newValue);
     }
   }
 
@@ -976,7 +986,7 @@ public abstract class MockComponent extends Composite implements PropertyChangeL
   public void delete() {
     OdeLog.log("Got delete component for " + this.getName());
     this.editor.getProjectEditor().clearLocation(getName());
-    getForm().select();
+    getRoot().select();
     // Pass true to indicate that the component is being permanently deleted.
     getContainer().removeComponent(this, true);
     // tell the component its been removed, so it can remove children's blocks

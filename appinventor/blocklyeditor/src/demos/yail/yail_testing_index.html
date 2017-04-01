@@ -41,7 +41,7 @@ function start() {
 
   // --- Begin Blockly Initialization
 
-  Blockly.mainWorkspace = Blockly.BlocklyEditor.create(document.body, '', /*readonly*/ false, /*rtl*/ false);
+  Blockly.mainWorkspace = Blockly.BlocklyEditor.create(document.body, '', /*readonly*/ false, /*rtl*/ false, /*targetLang*/ 'Yail');
 
   // [lyn, 2015/01/02] Logging interferes with equality tests.
   Blockly.Versioning.setLogging(false);

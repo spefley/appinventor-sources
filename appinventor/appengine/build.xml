@@ -93,7 +93,7 @@
         <include name="media/*"/>
       </fileset>
     </copy>
-    <copy file="${build.dir}/blocklyeditor/blockly-all.js" tofile="${build.war.dir}/WEB-INF/classes/com/google/appinventor/client/editor/youngandroid/blockly.js" />
+    <copy file="${build.dir}/blocklyeditor/blockly-all.js" tofile="${build.war.dir}/WEB-INF/classes/com/google/appinventor/client/editor/blocks/blockly.js" />
     <copy todir="${build.war.dir}/">
       <fileset dir="${lib.dir}">
         <include name="closure-library/**/*"/>

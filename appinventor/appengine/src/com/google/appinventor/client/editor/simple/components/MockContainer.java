@@ -174,7 +174,7 @@ public abstract class MockContainer extends MockVisibleComponent implements Drop
       refreshForm();
     }
 
-    getForm().fireComponentAdded(component);
+    getRoot().fireComponentAdded(component);
   }
 
   /**
@@ -201,7 +201,7 @@ public abstract class MockContainer extends MockVisibleComponent implements Drop
       editor.getNonVisibleComponentsPanel().removeComponent(component);
     }
 
-    getForm().fireComponentRemoved(component, permanentlyDeleted);
+    getRoot().fireComponentRemoved(component, permanentlyDeleted);
   }
 
   /**
@@ -318,7 +318,7 @@ public abstract class MockContainer extends MockVisibleComponent implements Drop
   public void onRemoved()
   {
     for (MockComponent child : children) {
-      getForm().fireComponentRemoved(child, true);
+      getRoot().fireComponentRemoved(child, true);
     }
   }
 

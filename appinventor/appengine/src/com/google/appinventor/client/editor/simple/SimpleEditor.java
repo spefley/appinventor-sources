@@ -11,6 +11,7 @@ import com.google.appinventor.client.editor.ProjectEditor;
 import com.google.appinventor.client.editor.simple.components.MockComponent;
 import com.google.appinventor.client.editor.simple.palette.SimplePalettePanel;
 import com.google.appinventor.shared.rpc.project.FileNode;
+import com.google.appinventor.shared.simple.ComponentDatabaseInterface;
 
 import java.util.List;
 import java.util.Map;
@@ -72,4 +73,6 @@ public abstract class SimpleEditor extends FileEditor {
    * Returns true if this editor is for Screen1.
    */
   public abstract boolean isScreen1();
+
+  public abstract ComponentDatabaseInterface getComponentDatabase();
 }
