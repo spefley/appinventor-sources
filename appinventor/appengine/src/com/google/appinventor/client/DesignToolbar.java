@@ -11,6 +11,7 @@ import com.google.appinventor.client.editor.ProjectEditor;
 import com.google.appinventor.client.editor.blocks.BlocklyPanel;
 
 import com.google.appinventor.client.explorer.commands.AddFormCommand;
+import com.google.appinventor.client.explorer.commands.AddSketchCommand;
 import com.google.appinventor.client.explorer.commands.ChainableCommand;
 import com.google.appinventor.client.explorer.commands.DeleteFileCommand;
 
@@ -76,6 +77,12 @@ public class DesignToolbar extends Toolbar {
     }
   }
 
+  public static class IotSketch extends EditorPair {
+    public IotSketch(String name, FileEditor microcontrollerEditor, FileEditor blocksEditor) {
+      super(name, microcontrollerEditor, blocksEditor);
+    }
+  }
+
   /*
    * A project as represented in the DesignToolbar. Each project has a name
    * (as displayed in the DesignToolbar on the left), a set of named screens,
@@ -84,11 +91,13 @@ public class DesignToolbar extends Toolbar {
   public static class DesignProject {
     public final String name;
     public final Map<String, Screen> screens; // screen name -> Screen
+    public final Map<String, IotSketch> iotSketches; // sketch name -> Sketch
     public String currentScreen; // name of currently displayed screen
 
     public DesignProject(String name, long projectId) {
       this.name = name;
       screens = Maps.newHashMap();
+      iotSketches = Maps.newHashMap();
       // Screen1 is initial screen by default
       currentScreen = YoungAndroidSourceNode.SCREEN1_FORM_NAME;
       // Let BlocklyPanel know which screen to send Yail for
@@ -112,10 +121,21 @@ public class DesignToolbar extends Toolbar {
     public void setCurrentScreen(String name) {
       currentScreen = name;
     }
+
+    public boolean addSketch(String name, FileEditor microcontrollerEditor, FileEditor blocksEditor) {
+      if (!iotSketches.containsKey(name)) {
+        iotSketches.put(name, new IotSketch(name, microcontrollerEditor, blocksEditor));
+        return true;
+      } else {
+        return false;
+      }
+    }
   }
 
   private static final String WIDGET_NAME_ADDFORM = "AddForm";
   private static final String WIDGET_NAME_REMOVEFORM = "RemoveForm";
+  private static final String WIDGET_NAME_ADDSKETCH = "AddSketch";
+  private static final String WIDGET_NAME_REMOVESKETCH = "RemoveSketch";
   private static final String WIDGET_NAME_SCREENS_DROPDOWN = "ScreensDropdown";
   private static final String WIDGET_NAME_SWITCH_TO_BLOCKS_EDITOR = "SwitchToBlocksEditor";
   private static final String WIDGET_NAME_SWITCH_TO_FORM_EDITOR = "SwitchToFormEditor";
@@ -167,6 +187,10 @@ public class DesignToolbar extends Toolbar {
     if (AppInventorFeatures.allowMultiScreenApplications() && !isReadOnly) {
       addButton(new ToolbarItem(WIDGET_NAME_ADDFORM, MESSAGES.addFormButton(),
           new AddFormAction()));
+      if (AppInventorFeatures.enableIotEditor() && !isReadOnly) {
+        addButton(new ToolbarItem(WIDGET_NAME_ADDSKETCH, MESSAGES.addSketchButton(),
+            new AddSketchAction()));
+      }
       addButton(new ToolbarItem(WIDGET_NAME_REMOVEFORM, MESSAGES.removeFormButton(),
           new RemoveFormAction()));
     }
@@ -217,6 +241,12 @@ public class DesignToolbar extends Toolbar {
   private class AddFormAction extends AddAction {
     AddFormAction() {
       super(Tracking.PROJECT_ACTION_ADDFORM_YA, new AddFormCommand());
+    }
+  }
+
+  private class AddSketchAction extends AddAction {
+    AddSketchAction() {
+      super(Tracking.PROJECT_ACTION_ADDSKETCH_IOT, new AddSketchCommand());
     }
   }
 

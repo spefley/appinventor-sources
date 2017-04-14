@@ -110,6 +110,14 @@ public interface OdeMessages extends Messages {
   @Description("Label of the button for removing a screen")
   String removeFormButton();
 
+  @DefaultMessage("Add Sketch ...")
+  @Description("Label of the button for adding a new sketch")
+  String addSketchButton();
+
+  @DefaultMessage("Remove Sketch")
+  @Description("Label of the button for removing a sketch")
+  String removeSketchButton();
+
   @DefaultMessage("Connect")
   @Description("Label of the button for selecting phone connection")
   String connectButton();
@@ -1342,6 +1350,14 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("Server error: could not add form. Please try again later!")
   @Description("Error message reported when adding a form failed on the server.")
   String addFormError();
+
+  @DefaultMessage("New Sketch")
+  @Description("Title of new Sketch dialog.")
+  String newSketchTitle();
+
+  @DefaultMessage("Sketch name:")
+  @Description("Label in front of name in new sketch dialog.")
+  String sketchNameLabel();
 
   // Used in explorer/commands/BuildCommand.java, and
   // explorer/commands/WaitForBuildResultCommand.java

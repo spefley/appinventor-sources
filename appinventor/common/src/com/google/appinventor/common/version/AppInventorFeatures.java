@@ -114,5 +114,15 @@ public final class AppInventorFeatures {
     return false;
   }
 
+  /**
+   * If set to true, additional UI features will be enabled for building sketches
+   * for embedded microcontrollers and Internet of Things devices.
+   *
+   * @return true to enable Internet of Things editors
+   */
+  public static boolean enableIotEditor() {
+    return true;
+  }
+
 
 }

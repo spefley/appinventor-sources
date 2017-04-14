@@ -89,6 +89,7 @@ public final class YoungAndroidProjectService extends CommonProjectService {
 
   // Project folder prefixes
   public static final String SRC_FOLDER = YoungAndroidSourceAnalyzer.SRC_FOLDER;
+  public static final String IOT_SRC_FOLDER = SRC_FOLDER + "/sketches";
   protected static final String ASSETS_FOLDER = "assets";
   private static final String EXTERNAL_COMPS_FOLDER = "assets/external_comps";
   static final String PROJECT_DIRECTORY = "youngandroidproject";
@@ -425,43 +426,46 @@ public final class YoungAndroidProjectService extends CommonProjectService {
       if (fileId.startsWith(ASSETS_FOLDER + '/')) {
         if (fileId.startsWith(EXTERNAL_COMPS_FOLDER + '/')) {
           compsNode.addChild(new YoungAndroidComponentNode(StorageUtil.basename(fileId), fileId));
-        }
-        else {
+        } else {
           assetsNode.addChild(new YoungAndroidAssetNode(StorageUtil.basename(fileId), fileId));
         }
       } else if (fileId.startsWith(SRC_FOLDER + '/')) {
-        // We send form (.scm), blocks (.blk), and yail (.yail) nodes to the ODE client.
-        YoungAndroidSourceNode sourceNode = null;
-        if (fileId.endsWith(FORM_PROPERTIES_EXTENSION)) {
-          sourceNode = new YoungAndroidFormNode(fileId);
-        } else if (fileId.endsWith(BLOCKLY_SOURCE_EXTENSION)) {
-          sourceNode = new YoungAndroidBlocksNode(fileId);
-        } else if (fileId.endsWith(CODEBLOCKS_SOURCE_EXTENSION)) {
-          String blocklyFileName =
-              fileId.substring(0, fileId.lastIndexOf(CODEBLOCKS_SOURCE_EXTENSION))
-              + BLOCKLY_SOURCE_EXTENSION;
-          if (!sourceFiles.contains(blocklyFileName)) {
-            // This is an old project that hasn't been converted yet. Convert
-            // the blocks file to Blockly format and name. Leave the old
-            // codeblocks file around for now (for debugging) but don't send it to the client.
-            String blocklyFileContents = convertCodeblocksToBlockly(userId, projectId, fileId);
-            storageIo.addSourceFilesToProject(userId, projectId, false, blocklyFileName);
-            storageIo.uploadFileForce(projectId, blocklyFileName, userId, blocklyFileContents,
-                StorageUtil.DEFAULT_CHARSET);
-            sourceNode = new YoungAndroidBlocksNode(blocklyFileName);
+        if (fileId.startsWith(IOT_SRC_FOLDER + '/')) {
+
+        } else {
+          // We send form (.scm), blocks (.blk), and yail (.yail) nodes to the ODE client.
+          YoungAndroidSourceNode sourceNode = null;
+          if (fileId.endsWith(FORM_PROPERTIES_EXTENSION)) {
+            sourceNode = new YoungAndroidFormNode(fileId);
+          } else if (fileId.endsWith(BLOCKLY_SOURCE_EXTENSION)) {
+            sourceNode = new YoungAndroidBlocksNode(fileId);
+          } else if (fileId.endsWith(CODEBLOCKS_SOURCE_EXTENSION)) {
+            String blocklyFileName =
+                fileId.substring(0, fileId.lastIndexOf(CODEBLOCKS_SOURCE_EXTENSION))
+                    + BLOCKLY_SOURCE_EXTENSION;
+            if (!sourceFiles.contains(blocklyFileName)) {
+              // This is an old project that hasn't been converted yet. Convert
+              // the blocks file to Blockly format and name. Leave the old
+              // codeblocks file around for now (for debugging) but don't send it to the client.
+              String blocklyFileContents = convertCodeblocksToBlockly(userId, projectId, fileId);
+              storageIo.addSourceFilesToProject(userId, projectId, false, blocklyFileName);
+              storageIo.uploadFileForce(projectId, blocklyFileName, userId, blocklyFileContents,
+                  StorageUtil.DEFAULT_CHARSET);
+              sourceNode = new YoungAndroidBlocksNode(blocklyFileName);
+            }
+          } else if (fileId.endsWith(YAIL_FILE_EXTENSION)) {
+            sourceNode = new YoungAndroidYailNode(fileId);
           }
-        } else if (fileId.endsWith(YAIL_FILE_EXTENSION)) {
-          sourceNode = new YoungAndroidYailNode(fileId);
-        }
-        if (sourceNode != null) {
-          String packageName = StorageUtil.getPackageName(sourceNode.getQualifiedName());
-          ProjectNode packageNode = packagesMap.get(packageName);
-          if (packageNode == null) {
-            packageNode = new YoungAndroidPackageNode(packageName, packageNameToPath(packageName));
-            packagesMap.put(packageName, packageNode);
-            sourcesNode.addChild(packageNode);
+          if (sourceNode != null) {
+            String packageName = StorageUtil.getPackageName(sourceNode.getQualifiedName());
+            ProjectNode packageNode = packagesMap.get(packageName);
+            if (packageNode == null) {
+              packageNode = new YoungAndroidPackageNode(packageName, packageNameToPath(packageName));
+              packagesMap.put(packageName, packageNode);
+              sourcesNode.addChild(packageNode);
+            }
+            packageNode.addChild(sourceNode);
           }
-          packageNode.addChild(sourceNode);
         }
       }
     }
