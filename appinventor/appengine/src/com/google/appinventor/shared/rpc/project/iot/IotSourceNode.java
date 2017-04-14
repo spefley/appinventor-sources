@@ -1,13 +1,19 @@
 // -*- mode: java; c-basic-offset: 2; -*-
 // Copyright © 2017 Massachusetts Institute of Technology, All rights reserved.
+
 package com.google.appinventor.shared.rpc.project.iot;
 
 import com.google.appinventor.shared.rpc.project.SourceNode;
+import com.google.appinventor.shared.youngandroid.YoungAndroidSourceAnalyzer;
 
 /**
- * Created by ewpatton on 3/31/17.
+ * Base class for all Internet of Things related source objects.
+ *
+ * @author ewpatton@mit.edu (Evan W. Patton)
  */
 public class IotSourceNode extends SourceNode {
+
+  protected static final String IOT_SRC_PREFIX = YoungAndroidSourceAnalyzer.IOT_SRC_FOLDER + '/';
 
   IotSourceNode() {
   }

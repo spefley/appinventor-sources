@@ -10,6 +10,7 @@ import com.google.appinventor.shared.rpc.project.HasAssetsFolder;
 import com.google.appinventor.shared.rpc.project.ProjectNode;
 import com.google.appinventor.shared.rpc.project.ProjectRootNode;
 import com.google.appinventor.shared.rpc.project.iot.IotPackageNode;
+import com.google.appinventor.shared.rpc.project.iot.IotSourceFolderNode;
 
 
 /**
@@ -102,16 +103,11 @@ public final class YoungAndroidProjectNode extends ProjectRootNode
     throw new IllegalStateException("Couldn't find component folder");
   }
 
-  public IotPackageNode getIotPackageNode() {
-    YoungAndroidSourceFolderNode src = null;
+  public IotSourceFolderNode getIotPackageNode() {
+    IotSourceFolderNode src = null;
     for (ProjectNode child : getChildren()) {
-      if (child instanceof YoungAndroidSourceFolderNode) {
-        src = (YoungAndroidSourceFolderNode) child;
-        for (ProjectNode child2 : child.getChildren()) {
-          if (child2 instanceof IotPackageNode) {
-            return (IotPackageNode) child2;
-          }
-        }
+      if (child instanceof IotSourceFolderNode) {
+        return src;
       }
     }
 

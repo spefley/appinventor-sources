@@ -254,6 +254,13 @@ public class Toolbar extends Composite {
     }
   }
 
+  protected void addDropDownButtonSeparator(String dropDownName) {
+    final DropDownButton button = dropDownButtonMap.get(dropDownName);
+    if (button != null) {
+      button.addSeparator();
+    }
+  }
+
   /**
    * Removes an item from a drop down button if it exists.
    *
@@ -264,6 +271,13 @@ public class Toolbar extends Composite {
     final DropDownButton button = dropDownButtonMap.get(dropDownName);
     if (button != null) {
       button.removeItem(itemName);
+    }
+  }
+
+  protected void removeDropDownButtonSeparator(String dropDownName) {
+    final DropDownButton button = dropDownButtonMap.get(dropDownName);
+    if (button != null) {
+      button.removeSeparator();
     }
   }
   

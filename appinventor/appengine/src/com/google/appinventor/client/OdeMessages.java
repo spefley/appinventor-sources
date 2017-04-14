@@ -1359,6 +1359,10 @@ public interface OdeMessages extends Messages {
   @Description("Label in front of name in new sketch dialog.")
   String sketchNameLabel();
 
+  @DefaultMessage("Server error: could not add sketch. Please try again later!")
+  @Description("Error message reported when adding a sketch failed on the server.")
+  String addSketchError();
+
   // Used in explorer/commands/BuildCommand.java, and
   // explorer/commands/WaitForBuildResultCommand.java
 

@@ -31,6 +31,10 @@ import com.google.appinventor.shared.rpc.project.ProjectRootNode;
 import com.google.appinventor.shared.rpc.project.ProjectSourceZip;
 import com.google.appinventor.shared.rpc.project.RawFile;
 import com.google.appinventor.shared.rpc.project.TextFile;
+import com.google.appinventor.shared.rpc.project.iot.IotBlocksNode;
+import com.google.appinventor.shared.rpc.project.iot.IotMicrocontrollerNode;
+import com.google.appinventor.shared.rpc.project.iot.IotSourceFolderNode;
+import com.google.appinventor.shared.rpc.project.iot.IotSourceNode;
 import com.google.appinventor.shared.rpc.project.youngandroid.NewYoungAndroidProjectParameters;
 import com.google.appinventor.shared.rpc.project.youngandroid.YoungAndroidAssetNode;
 import com.google.appinventor.shared.rpc.project.youngandroid.YoungAndroidAssetsFolder;
@@ -89,7 +93,7 @@ public final class YoungAndroidProjectService extends CommonProjectService {
 
   // Project folder prefixes
   public static final String SRC_FOLDER = YoungAndroidSourceAnalyzer.SRC_FOLDER;
-  public static final String IOT_SRC_FOLDER = SRC_FOLDER + "/sketches";
+  public static final String IOT_SRC_FOLDER = YoungAndroidSourceAnalyzer.IOT_SRC_FOLDER;
   protected static final String ASSETS_FOLDER = "assets";
   private static final String EXTERNAL_COMPS_FOLDER = "assets/external_comps";
   static final String PROJECT_DIRECTORY = "youngandroidproject";
@@ -103,6 +107,11 @@ public final class YoungAndroidProjectService extends CommonProjectService {
       YoungAndroidSourceAnalyzer.BLOCKLY_SOURCE_EXTENSION;
   private static final String YAIL_FILE_EXTENSION =
       YoungAndroidSourceAnalyzer.YAIL_FILE_EXTENSION;
+  private static final String MICROCONTROLLER_PROPERTIES_EXTENSION =
+      YoungAndroidSourceAnalyzer.MICROCONTROLLER_PROPERTIES_EXTENSION;
+  private static final String IOTVM_BLOCKS_EXTENSION =
+      YoungAndroidSourceAnalyzer.IOTVM_BLOCKS_EXTENSION;
+
 
   public static final String PROJECT_PROPERTIES_FILE_NAME = PROJECT_DIRECTORY + "/" +
       "project.properties";
@@ -412,10 +421,12 @@ public final class YoungAndroidProjectService extends CommonProjectService {
     ProjectNode assetsNode = new YoungAndroidAssetsFolder(ASSETS_FOLDER);
     ProjectNode sourcesNode = new YoungAndroidSourceFolderNode(SRC_FOLDER);
     ProjectNode compsNode = new YoungAndroidComponentsFolder(EXTERNAL_COMPS_FOLDER);
+    ProjectNode sketchesNode = new IotSourceFolderNode(IOT_SRC_FOLDER);
 
     rootNode.addChild(assetsNode);
     rootNode.addChild(sourcesNode);
     rootNode.addChild(compsNode);
+    rootNode.addChild(sketchesNode);
 
     // Sources contains nested folders that are interpreted as packages
     Map<String, ProjectNode> packagesMap = Maps.newHashMap();
@@ -430,42 +441,48 @@ public final class YoungAndroidProjectService extends CommonProjectService {
           assetsNode.addChild(new YoungAndroidAssetNode(StorageUtil.basename(fileId), fileId));
         }
       } else if (fileId.startsWith(SRC_FOLDER + '/')) {
-        if (fileId.startsWith(IOT_SRC_FOLDER + '/')) {
-
-        } else {
-          // We send form (.scm), blocks (.blk), and yail (.yail) nodes to the ODE client.
-          YoungAndroidSourceNode sourceNode = null;
-          if (fileId.endsWith(FORM_PROPERTIES_EXTENSION)) {
-            sourceNode = new YoungAndroidFormNode(fileId);
-          } else if (fileId.endsWith(BLOCKLY_SOURCE_EXTENSION)) {
-            sourceNode = new YoungAndroidBlocksNode(fileId);
-          } else if (fileId.endsWith(CODEBLOCKS_SOURCE_EXTENSION)) {
-            String blocklyFileName =
-                fileId.substring(0, fileId.lastIndexOf(CODEBLOCKS_SOURCE_EXTENSION))
-                    + BLOCKLY_SOURCE_EXTENSION;
-            if (!sourceFiles.contains(blocklyFileName)) {
-              // This is an old project that hasn't been converted yet. Convert
-              // the blocks file to Blockly format and name. Leave the old
-              // codeblocks file around for now (for debugging) but don't send it to the client.
-              String blocklyFileContents = convertCodeblocksToBlockly(userId, projectId, fileId);
-              storageIo.addSourceFilesToProject(userId, projectId, false, blocklyFileName);
-              storageIo.uploadFileForce(projectId, blocklyFileName, userId, blocklyFileContents,
-                  StorageUtil.DEFAULT_CHARSET);
-              sourceNode = new YoungAndroidBlocksNode(blocklyFileName);
-            }
-          } else if (fileId.endsWith(YAIL_FILE_EXTENSION)) {
-            sourceNode = new YoungAndroidYailNode(fileId);
+        // We send form (.scm), blocks (.blk), and yail (.yail) nodes to the ODE client.
+        YoungAndroidSourceNode sourceNode = null;
+        if (fileId.endsWith(FORM_PROPERTIES_EXTENSION)) {
+          sourceNode = new YoungAndroidFormNode(fileId);
+        } else if (fileId.endsWith(BLOCKLY_SOURCE_EXTENSION)) {
+          sourceNode = new YoungAndroidBlocksNode(fileId);
+        } else if (fileId.endsWith(CODEBLOCKS_SOURCE_EXTENSION)) {
+          String blocklyFileName =
+              fileId.substring(0, fileId.lastIndexOf(CODEBLOCKS_SOURCE_EXTENSION))
+                  + BLOCKLY_SOURCE_EXTENSION;
+          if (!sourceFiles.contains(blocklyFileName)) {
+            // This is an old project that hasn't been converted yet. Convert
+            // the blocks file to Blockly format and name. Leave the old
+            // codeblocks file around for now (for debugging) but don't send it to the client.
+            String blocklyFileContents = convertCodeblocksToBlockly(userId, projectId, fileId);
+            storageIo.addSourceFilesToProject(userId, projectId, false, blocklyFileName);
+            storageIo.uploadFileForce(projectId, blocklyFileName, userId, blocklyFileContents,
+                StorageUtil.DEFAULT_CHARSET);
+            sourceNode = new YoungAndroidBlocksNode(blocklyFileName);
           }
-          if (sourceNode != null) {
-            String packageName = StorageUtil.getPackageName(sourceNode.getQualifiedName());
-            ProjectNode packageNode = packagesMap.get(packageName);
-            if (packageNode == null) {
-              packageNode = new YoungAndroidPackageNode(packageName, packageNameToPath(packageName));
-              packagesMap.put(packageName, packageNode);
-              sourcesNode.addChild(packageNode);
-            }
-            packageNode.addChild(sourceNode);
+        } else if (fileId.endsWith(YAIL_FILE_EXTENSION)) {
+          sourceNode = new YoungAndroidYailNode(fileId);
+        }
+        if (sourceNode != null) {
+          String packageName = StorageUtil.getPackageName(sourceNode.getQualifiedName());
+          ProjectNode packageNode = packagesMap.get(packageName);
+          if (packageNode == null) {
+            packageNode = new YoungAndroidPackageNode(packageName, packageNameToPath(packageName));
+            packagesMap.put(packageName, packageNode);
+            sourcesNode.addChild(packageNode);
           }
+          packageNode.addChild(sourceNode);
+        }
+      } else if (fileId.startsWith(IOT_SRC_FOLDER + '/')) {
+        IotSourceNode sourceNode = null;
+        if (fileId.endsWith(MICROCONTROLLER_PROPERTIES_EXTENSION)) {
+          sourceNode = new IotMicrocontrollerNode(fileId);
+        } else if (fileId.endsWith(IOTVM_BLOCKS_EXTENSION)) {
+          sourceNode = new IotBlocksNode(fileId);
+        }
+        if (sourceNode != null) {
+          sketchesNode.addChild(sourceNode);
         }
       }
     }

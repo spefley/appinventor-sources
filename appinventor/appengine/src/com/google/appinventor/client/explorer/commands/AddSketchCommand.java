@@ -3,13 +3,22 @@
 
 package com.google.appinventor.client.explorer.commands;
 
+import com.google.appinventor.client.DesignToolbar;
 import com.google.appinventor.client.Ode;
+import com.google.appinventor.client.OdeAsyncCallback;
+import com.google.appinventor.client.editor.FileEditor;
+import com.google.appinventor.client.editor.ProjectEditor;
+import com.google.appinventor.client.explorer.project.Project;
 import com.google.appinventor.client.widgets.LabeledTextBox;
 import com.google.appinventor.client.youngandroid.TextValidators;
 import com.google.appinventor.shared.rpc.project.ProjectNode;
+import com.google.appinventor.shared.rpc.project.iot.IotBlocksNode;
 import com.google.appinventor.shared.rpc.project.iot.IotMicrocontrollerNode;
 import com.google.appinventor.shared.rpc.project.iot.IotPackageNode;
+import com.google.appinventor.shared.rpc.project.iot.IotSourceFolderNode;
 import com.google.appinventor.shared.rpc.project.youngandroid.YoungAndroidProjectNode;
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -146,11 +155,50 @@ public class AddSketchCommand extends ChainableCommand {
 
       return true;
     }
+
     protected void addSketchAction(final YoungAndroidProjectNode projectRootNode,
                                    final String sketchName) {
       final Ode ode = Ode.getInstance();
-      final IotPackageNode packageNode = projectRootNode.getIotPackageNode();
-      String qualifiedSketchName = packageNode.getPackageName() + '.' + sketchName;
+      final IotSourceFolderNode packageNode = projectRootNode.getIotPackageNode();
+      final String sketchFileId = IotMicrocontrollerNode.getMicrocontrollerFileId(sketchName);
+      final String blocksFileId = IotBlocksNode.getBlocksFileId(sketchName);
+
+      OdeAsyncCallback<Long> callback = new OdeAsyncCallback<Long>(MESSAGES.addSketchError()) {
+        @Override
+        public void onSuccess(Long modDate) {
+          ode.updateModificationDate(projectRootNode.getProjectId(), modDate);
+
+          final Project project = ode.getProjectManager().getProject(projectRootNode);
+          project.addNode(packageNode, new IotMicrocontrollerNode(sketchFileId));
+          project.addNode(packageNode, new IotBlocksNode(blocksFileId));
+
+          Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+            @Override
+            public void execute() {
+              ProjectEditor projectEditor =
+                  ode.getEditorManager().getOpenProjectEditor(project.getProjectId());
+              FileEditor designer = projectEditor.getFileEditor(sketchFileId);
+              FileEditor blocks = projectEditor.getFileEditor(blocksFileId);
+              if (designer != null && blocks != null && !ode.screensLocked()) {
+                DesignToolbar designToolbar = ode.getDesignToolbar();
+                long projectId = designer.getProjectId();
+                designToolbar.addSketch(projectId, sketchName, designer, blocks);
+                executeNextCommand(projectRootNode);
+              } else {
+                Scheduler.get().scheduleDeferred(this);
+              }
+            }
+          });
+        }
+
+        @Override
+        public void onFailure(Throwable caught) {
+          super.onFailure(caught);
+          executionFailedOrCanceled();
+        }
+      };
+
+      ode.getProjectService().addFile(projectRootNode.getProjectId(), sketchFileId, callback);
     }
   }
 }

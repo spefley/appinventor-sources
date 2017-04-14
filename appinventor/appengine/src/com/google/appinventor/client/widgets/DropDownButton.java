@@ -9,6 +9,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.MenuItem;
 
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.MenuItemSeparator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,7 @@ public class DropDownButton extends TextButton {
   private final ContextMenu menu;
   private final List<MenuItem> items;
   private final boolean rightAlign;
+  private MenuItemSeparator separator = null;
 
   public static class DropDownItem {
     private final String widgetName;
@@ -198,6 +200,19 @@ public class DropDownButton extends TextButton {
         item.setEnabled(enabled);
         break;
       }
+    }
+  }
+
+  public void addSeparator() {
+    if (separator == null) {
+      separator = menu.addSeparator();
+    }
+  }
+
+  public void removeSeparator() {
+    if (separator != null) {
+      menu.removeSeparator(separator);
+      separator = null;
     }
   }
 

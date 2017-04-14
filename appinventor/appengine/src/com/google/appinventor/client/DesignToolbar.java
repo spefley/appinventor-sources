@@ -34,6 +34,7 @@ import com.google.common.collect.Maps;
 
 import com.google.gwt.core.client.Scheduler;
 
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -129,6 +130,10 @@ public class DesignToolbar extends Toolbar {
       } else {
         return false;
       }
+    }
+
+    public void removeSketch(String name) {
+      iotSketches.remove(name);
     }
   }
 
@@ -364,6 +369,87 @@ public class DesignToolbar extends Toolbar {
     screen.blocksEditor.makeActiveWorkspace();
   }
 
+  private class SwitchSketchAction implements Command {
+    private final long projectId;
+    private final String name;
+
+    public SwitchSketchAction(long projectId, String sketchName) {
+      this.projectId = projectId;
+      this.name = sketchName;
+    }
+
+    @Override
+    public void execute() {
+      if (currentView == View.BLOCKS) {
+        Ode.getInstance().screenShotMaybe(new Runnable() {
+          @Override
+          public void run() {
+            doSwitchSketch(projectId, name, currentView);
+          }
+        }, false);
+      } else {
+        doSwitchSketch(projectId, name, currentView);
+      }
+    }
+  }
+
+  private void doSwitchSketch(final long projectId, final String sketchName, final View view) {
+    Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+      @Override
+      public void execute() {
+        if (Ode.getInstance().screensLocked()) {
+          Scheduler.get().scheduleDeferred(this);
+        } else {
+          doSwitchSketch1(projectId, sketchName, view);
+        }
+      }
+    });
+  }
+
+  private void doSwitchSketch1(long projectId, String sketchName, View view) {
+    if (!projectMap.containsKey(projectId)) {
+      OdeLog.wlog("DesignToolbar: no project with id " + projectId
+          + ". Ignoring SwitchSketchAction.execute().");
+      return;
+    }
+    DesignProject project = projectMap.get(projectId);
+    if (currentProject != project) {
+      // need to switch projects first. this will not switch screens.
+      if (!switchToProject(projectId, project.name)) {
+        return;
+      }
+    }
+    if (!currentProject.iotSketches.containsKey(sketchName)) {
+      // Can't find the requested sketch in this project. This shouldn't happen, but if it does
+      // for some reason, try switching to Screen1 instead.
+      OdeLog.wlog("Trying to switch to non-existent sketch " + sketchName +
+          " in project " + currentProject.name + ". Trying Screen1 instead.");
+      if (currentProject.screens.containsKey(YoungAndroidSourceNode.SCREEN1_FORM_NAME)) {
+        switchToScreen(projectId, YoungAndroidSourceNode.SCREEN1_FORM_NAME, view);
+      } else {
+        // something went seriously wrong!
+        ErrorReporter.reportError("Something is wrong. Can't find Screen1 for project "
+            + currentProject.name);
+      }
+      return;
+    }
+    currentView = view;
+    IotSketch sketch = currentProject.iotSketches.get(sketchName);
+    ProjectEditor projectEditor = sketch.designerEditor.getProjectEditor();
+    currentProject.setCurrentScreen("iot" + sketchName);
+    setDropDownButtonCaption(WIDGET_NAME_SCREENS_DROPDOWN, sketchName);
+    if (currentView == View.DESIGNER) {
+      projectEditor.selectFileEditor(sketch.designerEditor);
+      toggleEditor(false);
+    } else {
+      projectEditor.selectFileEditor(sketch.blocksEditor);
+      toggleEditor(true);
+    }
+    Ode.getInstance().getTopToolbar().updateFileMenuButtons(1);
+    BlocklyPanel.setCurrentForm(projectId + "_" + sketch);
+    sketch.blocksEditor.makeActiveWorkspace();
+  }
+
   private class SwitchToBlocksEditorAction implements Command {
     @Override
     public void execute() {
@@ -533,6 +619,45 @@ public class DesignToolbar extends Toolbar {
       removeDropDownButtonItem(WIDGET_NAME_SCREENS_DROPDOWN, name);
     }
     project.removeScreen(name);
+  }
+
+  public void addSketch(long projectId, String name, FileEditor designer, FileEditor blocks) {
+    if (!projectMap.containsKey(projectId)) {
+      OdeLog.wlog("DesignToolbar can't find project " + name + " with id " + projectId
+          + ". Ignoring addSketch().");
+      return;
+    }
+    DesignProject project = projectMap.get(projectId);
+    if (project.addSketch(name, designer, blocks)) {
+      if (currentProject == project) {
+        if (project.iotSketches.size() == 1) {
+          addDropDownButtonSeparator(WIDGET_NAME_SCREENS_DROPDOWN);
+        }
+        addDropDownButtonItem(WIDGET_NAME_SCREENS_DROPDOWN, new DropDownItem("iot:" + name,
+            name, new SwitchSketchAction(projectId, name)));
+      }
+    }
+  }
+
+  public void removeSketch(long projectId, String name) {
+    if (!projectMap.containsKey(projectId)) {
+      OdeLog.wlog("DesignToolbar can't find project " + name + " with id " + projectId
+          + ". Ignoring removeSketch().");
+      return;
+    }
+    DesignProject project = projectMap.get(projectId);
+    if (!project.iotSketches.containsKey(name)) {
+      // already removed this sketch
+      return;
+    }
+    if (currentProject == project) {
+      switchToScreen(projectId, YoungAndroidSourceNode.SCREEN1_FORM_NAME, View.DESIGNER);
+      removeDropDownButtonItem(WIDGET_NAME_SCREENS_DROPDOWN, "iot:" + name);
+    }
+    project.removeSketch(name);
+    if (project.iotSketches.size() == 0) {
+      removeDropDownButtonSeparator(WIDGET_NAME_SCREENS_DROPDOWN);
+    }
   }
 
   private void toggleEditor(boolean blocks) {

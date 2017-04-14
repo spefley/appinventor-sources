@@ -16,7 +16,7 @@
   <!-- inherits -->
 
   <inherits name="com.google.gwt.user.User" />
-  <inherits name="com.google.gwt.i18n.I18N"/>
+  <!--<inherits name="com.google.gwt.i18n.I18N"/>-->
   <!--inherits name="com.google.gwt.i18n.CldrLocales"/-->
   <inherits name="com.google.gwt.json.JSON" />
   <inherits name="com.google.gwt.libideas.ImmutableResources" />
@@ -133,7 +133,9 @@
   <set-property-fallback name="locale" value="en"/>
   -->
 
-  <add-linker name="std" />
+  <add-linker name="sso" />
+
+  <collapse-all-properties />
 
 </module>
 
