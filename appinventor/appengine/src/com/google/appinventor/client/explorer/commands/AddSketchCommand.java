@@ -4,6 +4,7 @@
 package com.google.appinventor.client.explorer.commands;
 
 import com.google.appinventor.client.DesignToolbar;
+import com.google.appinventor.client.DesignToolbar.View;
 import com.google.appinventor.client.Ode;
 import com.google.appinventor.client.OdeAsyncCallback;
 import com.google.appinventor.client.editor.FileEditor;
@@ -14,8 +15,8 @@ import com.google.appinventor.client.youngandroid.TextValidators;
 import com.google.appinventor.shared.rpc.project.ProjectNode;
 import com.google.appinventor.shared.rpc.project.iot.IotBlocksNode;
 import com.google.appinventor.shared.rpc.project.iot.IotMicrocontrollerNode;
-import com.google.appinventor.shared.rpc.project.iot.IotPackageNode;
 import com.google.appinventor.shared.rpc.project.iot.IotSourceFolderNode;
+import com.google.appinventor.shared.rpc.project.iot.IotSourceNode;
 import com.google.appinventor.shared.rpc.project.youngandroid.YoungAndroidProjectNode;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
@@ -162,6 +163,7 @@ public class AddSketchCommand extends ChainableCommand {
       final IotSourceFolderNode packageNode = projectRootNode.getIotPackageNode();
       final String sketchFileId = IotMicrocontrollerNode.getMicrocontrollerFileId(sketchName);
       final String blocksFileId = IotBlocksNode.getBlocksFileId(sketchName);
+      final String sketchId = IotSourceNode.getPrefixedSketchName(sketchName);
 
       OdeAsyncCallback<Long> callback = new OdeAsyncCallback<Long>(MESSAGES.addSketchError()) {
         @Override
@@ -182,7 +184,8 @@ public class AddSketchCommand extends ChainableCommand {
               if (designer != null && blocks != null && !ode.screensLocked()) {
                 DesignToolbar designToolbar = ode.getDesignToolbar();
                 long projectId = designer.getProjectId();
-                designToolbar.addSketch(projectId, sketchName, designer, blocks);
+                designToolbar.addSketch(projectId, sketchId, designer, blocks);
+                designToolbar.switchToSketch(projectId, sketchId, View.DESIGNER);
                 executeNextCommand(projectRootNode);
               } else {
                 Scheduler.get().scheduleDeferred(this);

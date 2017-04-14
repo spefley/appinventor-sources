@@ -145,9 +145,11 @@
     './src/blocks/lexical-variables.js',
     './src/blocks/colors.js',
     './src/blocks/components.js',
+    './src/blocks/inputoutput.js',
 
     // drawer files
     './src/blocks/yail.js',
+    './src/blocks/iot.js',
 
     //generator files
     "./src/generators/yail.js",

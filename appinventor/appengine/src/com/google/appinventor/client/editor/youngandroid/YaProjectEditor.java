@@ -16,6 +16,8 @@ import com.google.appinventor.client.editor.ProjectEditor;
 import com.google.appinventor.client.editor.ProjectEditorFactory;
 import com.google.appinventor.client.editor.blocks.BlocksEditor;
 import com.google.appinventor.client.editor.designer.DesignerEditor;
+import com.google.appinventor.client.editor.iot.IotBlocksEditor;
+import com.google.appinventor.client.editor.iot.IotMicrocontrollerEditor;
 import com.google.appinventor.client.editor.simple.SimpleComponentDatabase;
 import com.google.appinventor.client.explorer.project.Project;
 import com.google.appinventor.client.explorer.project.ProjectChangeListener;
@@ -27,6 +29,8 @@ import com.google.appinventor.shared.rpc.project.ChecksumedFileException;
 import com.google.appinventor.shared.rpc.project.ChecksumedLoadFile;
 import com.google.appinventor.shared.rpc.project.ProjectNode;
 import com.google.appinventor.shared.rpc.project.ProjectRootNode;
+import com.google.appinventor.shared.rpc.project.iot.IotBlocksNode;
+import com.google.appinventor.shared.rpc.project.iot.IotMicrocontrollerNode;
 import com.google.appinventor.shared.rpc.project.youngandroid.YoungAndroidBlocksNode;
 import com.google.appinventor.shared.rpc.project.youngandroid.YoungAndroidComponentsFolder;
 import com.google.appinventor.shared.rpc.project.youngandroid.YoungAndroidFormNode;
@@ -166,12 +170,18 @@ public final class YaProjectEditor extends ProjectEditor implements ProjectChang
       if (source instanceof YoungAndroidFormNode) {
         addDesigner(((YoungAndroidFormNode) source).getFormName(),
             new YaFormEditor(this, (YoungAndroidFormNode) source));
+      } else if (source instanceof IotMicrocontrollerNode) {
+        addDesigner("iot:" + ((IotMicrocontrollerNode) source).getEntityName(),
+            new IotMicrocontrollerEditor(this, (IotMicrocontrollerNode) source));
       }
     }
     for (ProjectNode source : projectRootNode.getAllSourceNodes()) {
       if (source instanceof YoungAndroidBlocksNode) {
         addBlocksEditor(((YoungAndroidBlocksNode) source).getFormName(),
             new YaBlocksEditor(this, (YoungAndroidBlocksNode) source));
+      } else if (source instanceof IotBlocksNode) {
+        addBlocksEditor("iot:" + ((IotBlocksNode) source).getEntityName(),
+            new IotBlocksEditor(this, (IotBlocksNode) source));
       }
     }
     // Add the screens to the design toolbar, along with their associated editors
@@ -179,8 +189,13 @@ public final class YaProjectEditor extends ProjectEditor implements ProjectChang
     for (String formName : editorMap.keySet()) {
       EditorSet editors = editorMap.get(formName);
       if (editors.formEditor != null && editors.blocksEditor != null) {
-        designToolbar.addScreen(projectRootNode.getProjectId(), formName, editors.formEditor, 
-            editors.blocksEditor);
+        if (formName.startsWith("iot:")) {
+          designToolbar.addSketch(projectRootNode.getProjectId(), formName, editors.formEditor,
+              editors.blocksEditor);
+        } else {
+          designToolbar.addScreen(projectRootNode.getProjectId(), formName, editors.formEditor,
+              editors.blocksEditor);
+        }
         if (isScreen1(formName)) {
           screen1Added = true;
           if (readyToShowScreen1()) {  // probably not yet but who knows?
@@ -267,13 +282,28 @@ public final class YaProjectEditor extends ProjectEditor implements ProjectChang
             new YaBlocksEditor(this, (YoungAndroidBlocksNode) node));
         formName = ((YoungAndroidBlocksNode) node).getFormName();
       }
+    } else if (node instanceof IotMicrocontrollerNode) {
+      if (getFileEditor(node.getFileId()) == null) {
+        formName = "iot:" + ((IotMicrocontrollerNode) node).getEntityName();
+        addDesigner(formName, new IotMicrocontrollerEditor(this, (IotMicrocontrollerNode) node));
+      }
+    } else if (node instanceof IotBlocksNode) {
+      if (getFileEditor(node.getFileId()) == null) {
+        formName = "iot:" + ((IotBlocksNode) node).getEntityName();
+        addBlocksEditor(formName, new IotBlocksEditor(this, (IotBlocksNode) node));
+      }
     }
     if (formName != null) {
       // see if we have both editors yet
       EditorSet editors = editorMap.get(formName);
       if (editors.formEditor != null && editors.blocksEditor != null) {
-        Ode.getInstance().getDesignToolbar().addScreen(node.getProjectId(), formName, 
-            editors.formEditor, editors.blocksEditor);
+        if (formName.startsWith("iot:")) {
+          Ode.getInstance().getDesignToolbar().addSketch(node.getProjectId(), formName.substring(4),
+              editors.formEditor, editors.blocksEditor);
+        } else {
+          Ode.getInstance().getDesignToolbar().addScreen(node.getProjectId(), formName,
+              editors.formEditor, editors.blocksEditor);
+        }
       }
     }
   }

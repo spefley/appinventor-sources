@@ -308,6 +308,28 @@ Blockly.Msg.en.switch_language_to_english = {
         + 'opened this one.   This command is for returning text to non-App Inventor activities, not to App Inventor screens. '
         + 'For App Inventor Screens, as in multiple screen apps, use Close Screen with Value, not Close Screen with Plain Text.';
 
+    Blockly.Msg.LANG_CONTROLS_DELAY_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/control#delay';
+    Blockly.Msg.LANG_CONTROLS_DELAY_TITLE = 'delay';
+    Blockly.Msg.LANG_CONTROLS_DELAY_INPUT_TEXT = 'milliseconds';
+    Blockly.Msg.LANG_CONTROLS_DELAY_TOOLTIP = 'Delay the running program code by the given number of milliseconds.';
+
+// Input/Output Blocks.
+    Blockly.Msg.LANG_INPUTOUTPUT_PIN_MODE_INPUT = 'Input';
+    Blockly.Msg.LANG_INPUTOUTPUT_PIN_MODE_OUTPUT = 'Output';
+    Blockly.Msg.LANG_INPUTOUTPUT_PIN_MODE_INPUT_TOOLTIP = 'Used to set the mode of a pin to "Input"';
+    Blockly.Msg.LANG_INPUTOUTPUT_PIN_MODE_OUTPUT_TOOLTIP = 'Used to set the mode of a pin to "Output"';
+    Blockly.Msg.LANG_INPUTOUTPUT_PIN_MODE_INPUT_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/input-output#=';
+    Blockly.Msg.LANG_INPUTOUTPUT_PIN_MODE_OUTPUT_HELPURL = 'http://appinventor.mit.edu/explore/ai2/support/blocks/input-output#=';
+
+    Blockly.Msg.LANG_INPUTOUTPUT_PIN = 'pin';
+    Blockly.Msg.LANG_INPUTOUTPUT_FIELD_TO = 'to';
+    Blockly.Msg.LANG_INPUTOUTPUT_FIELD_VALUE = 'value';
+
+    Blockly.Msg.LANG_INPUTOUTPUT_SET_PIN_MODE_TITLE = 'set mode of';
+    Blockly.Msg.LANG_INPUTOUTPUT_SET_PIN_MODE_TOOLTIP = 'Set a pin to be either an input pin or an output pin.';
+    Blockly.Msg.LANG_INPUTOUTPUT_READ_FROM_PIN_TITLE = 'read from';
+    Blockly.Msg.LANG_INPUTOUTPUT_WRITE_TO_PIN_TITLE = 'write to';
+
 // Logic Blocks.
     Blockly.Msg.LANG_CATEGORY_LOGIC = 'Logic';
     Blockly.Msg.LANG_LOGIC_COMPARE_HELPURL = 'http://en.wikipedia.org/wiki/Inequality_(mathematics)';

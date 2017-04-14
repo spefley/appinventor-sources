@@ -1,10 +1,13 @@
 // -*- mode: java; c-basic-offset: 2; -*-
 // Copyright © 2017 Massachusetts Institute of Technology, All rights reserved.
 
-package com.google.appinventor.client.editor.iot;
+package com.google.appinventor.client.editor.iot.palette;
 
+import com.google.appinventor.client.editor.iot.IotDeviceDatabase;
+import com.google.appinventor.client.editor.iot.IotMicrocontrollerEditor;
 import com.google.appinventor.client.editor.simple.palette.SimplePalettePanel;
-import com.google.appinventor.client.editor.youngandroid.palette.AbstractPalettePanel;
+import com.google.appinventor.client.editor.simple.palette.AbstractPalettePanel;
+import com.google.appinventor.components.common.ComponentCategory;
 
 /**
  * Panel showing IOT components that can be dropped onto the IOT designer panel.
@@ -14,7 +17,8 @@ import com.google.appinventor.client.editor.youngandroid.palette.AbstractPalette
 public class IotPalettePanel extends AbstractPalettePanel<IotDeviceDatabase, IotMicrocontrollerEditor> {
 
   public IotPalettePanel(IotMicrocontrollerEditor editor) {
-    super(editor);
+    super(editor, new IotDeviceFactory(editor), ComponentCategory.USERINTERFACE,
+        ComponentCategory.SENSORS, ComponentCategory.CONNECTIVITY);
   }
 
   // AbstractPalettePanel implementation

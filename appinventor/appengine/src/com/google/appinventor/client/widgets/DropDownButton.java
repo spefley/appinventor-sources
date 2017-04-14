@@ -177,6 +177,10 @@ public class DropDownButton extends TextButton {
     for (MenuItem item : items) {
       menu.removeItem(item);
     }
+    if (separator != null) {
+      menu.removeSeparator(separator);
+      separator = null;
+    }
     items.clear();
   }
 

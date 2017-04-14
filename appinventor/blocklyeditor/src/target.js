@@ -3,10 +3,17 @@
 
 goog.provide('AI.Blockly.Target');
 goog.require('Blockly.Blocks.Utilities');
+goog.require('Blockly.Blocks.Iot');
 goog.require('Blockly.Blocks.Yail');
 
 AI.Blockly.Target['Yail'] = {
   blocks: Blockly.Blocks.Yail,
   generateCode: Blockly.Yail.getFormYail,
   typeMappingFunction: Blockly.Blocks.Utilities.YailTypeToBlocklyType
+};
+
+AI.Blockly.Target['IOT'] = {
+  blocks: Blockly.Blocks.Iot,
+  generateCode: Blockly.Iot.getMicrocontrollerBytecode,
+  typeMappingFunction: Blockly.Blocks.Utilities.IotTypeToBlocklyType
 };

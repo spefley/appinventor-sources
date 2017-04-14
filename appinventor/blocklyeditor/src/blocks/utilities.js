@@ -53,6 +53,29 @@ Blockly.Blocks.Utilities.YailTypeToBlocklyType = function(yail,inputOrOutput) {
 };
 
 
+Blockly.Blocks.Utilities.IotTypeToBlocklyTypeMap = {
+  'valuefloat': {'input': 'Number', 'output': ['Number', 'String']},
+  'valueint': {'input': 'Number', 'output': ['Number', 'String']},
+  'valuebool': {'input': 'Boolean', 'output': ['Boolean', 'String']},
+  'strvalue': {'input': 'String', 'output': ['String']},
+  'colorvalue': {'input': 'Number', 'output': 'Number'},
+  'Device *': {'input': 'Device', 'output': 'Device'},
+  'value': {'input': null, 'output': null}
+};
+
+
+Blockly.Blocks.Utilities.IotTypeToBlocklyType = function(type, direction) {
+  var directionName = direction === Blockly.Blocks.Utilities.OUTPUT ? 'output' : 'input';
+  var blockType = Blockly.Blocks.Utilities.IotTypeToBlocklyType[type][directionName];
+
+  if (blockType !== null || type === 'any') {
+    return blockType;
+  } else {
+    throw new Error('Unknown IOT type: ' + type);
+  }
+};
+
+
 // Blockly doesn't wrap tooltips, so these can get too wide.  We'll create our own tooltip setter
 // that wraps to length 60.
 

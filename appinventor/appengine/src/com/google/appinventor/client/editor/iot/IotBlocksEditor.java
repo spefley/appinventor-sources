@@ -19,18 +19,23 @@ public final class IotBlocksEditor extends BlocksEditor<IotBlocksNode, IotMicroc
   private static final BlocksLanguage IOT =
       new BlocksLanguage("IOT",
           new BlocksCategory("Control", IMAGES.control()),
+          new BlocksCategory("Input/Output", IMAGES.inputOutput()),
           new BlocksCategory("Logic", IMAGES.logic()),
           new BlocksCategory("Math", IMAGES.math()),
           new BlocksCategory("Text", IMAGES.text()),
           new BlocksCategory("Lists", IMAGES.lists()),
           new BlocksCategory("Colors", IMAGES.colors()),
           new BlocksCategory("Variables", IMAGES.variables()),
-          new BlocksCategory("Procedures", IMAGES.procedures()),
-          new BlocksCategory("Input/Output", IMAGES.inputOutput()));
+          new BlocksCategory("Procedures", IMAGES.procedures()));
 
-  IotBlocksEditor(YaProjectEditor projectEditor, IotBlocksNode blocksNode) {
+  public IotBlocksEditor(YaProjectEditor projectEditor, IotBlocksNode blocksNode) {
     super(projectEditor, blocksNode, IOT, BlocksCodeGenerationTarget.IOTVM,
         IotDeviceDatabase.getInstance(blocksNode.getProjectId()));
+  }
+
+  @Override
+  public void prepareForUnload() {
+
   }
 
 }

@@ -10,7 +10,9 @@ import com.google.appinventor.client.output.OdeLog;
 import com.google.appinventor.client.widgets.properties.EditableProperty;
 import com.google.appinventor.client.widgets.properties.PropertyEditor;
 import com.google.appinventor.shared.properties.json.JSONObject;
+import com.google.appinventor.shared.properties.json.JSONUtil;
 import com.google.appinventor.shared.properties.json.JSONValue;
+import com.google.gwt.json.client.JSONString;
 
 import java.util.Comparator;
 import java.util.TreeMap;
@@ -98,6 +100,17 @@ public class Properties<T extends Property> implements Iterable<T> {
    */
   public String encodeAsPairs(boolean forYail) {
     return encode(forYail, false);
+  }
+
+  public com.google.gwt.json.client.JSONObject encodeAsJson(boolean forYail, boolean all) {
+    com.google.gwt.json.client.JSONObject result = new com.google.gwt.json.client.JSONObject();
+    for (Property property : this) {
+      if ((property.isPersisted() || (property.isYail() && forYail)) &&
+          (all || !property.getDefaultValue().equals(property.getValue()))) {
+        result.put(property.getName(), new JSONString(property.getValue()));
+      }
+    }
+    return result;
   }
 
   /**

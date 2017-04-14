@@ -30,6 +30,7 @@ import com.google.appinventor.shared.rpc.project.ProjectNode;
 import com.google.appinventor.shared.rpc.project.ProjectRootNode;
 import com.google.appinventor.shared.rpc.project.ProjectSourceZip;
 import com.google.appinventor.shared.rpc.project.RawFile;
+import com.google.appinventor.shared.rpc.project.SourceNode;
 import com.google.appinventor.shared.rpc.project.TextFile;
 import com.google.appinventor.shared.rpc.project.iot.IotBlocksNode;
 import com.google.appinventor.shared.rpc.project.iot.IotMicrocontrollerNode;
@@ -227,6 +228,16 @@ public final class YoungAndroidProjectService extends CommonProjectService {
    * Returns the initial contents of a Young Android blockly blocks file.
    */
   private static String getInitialBlocklySourceFileContents(String qualifiedName) {
+    return "";
+  }
+
+  private static String getInitialMicrocontrollerProperties(String qualifiedName) {
+    return "{\"authURL\":[],\"IotVersion\":\"1\",\"Source\":\"Microcontroller\"," +
+        "\"Properties\":{\"$Name\":\"" + qualifiedName + "\",\"$Type\":\"Microcontroller\"," +
+        "\"$Version\":\"1\",\"Uuid\":\"0\"}}\n";
+  }
+
+  private static String getInitialIotBlocksFileContents(String qualifiedName) {
     return "";
   }
 
@@ -530,6 +541,32 @@ public final class YoungAndroidProjectService extends CommonProjectService {
         storageIo.addSourceFilesToProject(userId, projectId, false, yailFileName);
         return storageIo.uploadFileForce(projectId, yailFileName, userId, yailFileContents,
             StorageUtil.DEFAULT_CHARSET);
+      } else {
+        throw new IllegalStateException("One or more files to be added already exists.");
+      }
+
+    } else if (fileId.endsWith(IOTVM_BLOCKS_EXTENSION) ||
+        fileId.endsWith(MICROCONTROLLER_PROPERTIES_EXTENSION)) {
+
+      String qualifiedSketchName = SourceNode.getEntityName(fileId);
+      String microcontrollerFileName =
+          IotMicrocontrollerNode.getMicrocontrollerFileId(qualifiedSketchName);
+      String iotBlocksFileName = IotBlocksNode.getBlocksFileId(qualifiedSketchName);
+
+      List<String> sourceFiles = storageIo.getProjectSourceFiles(userId, projectId);
+      if (!sourceFiles.contains(microcontrollerFileName) &&
+          !sourceFiles.contains(iotBlocksFileName)) {
+
+        String microcontrollerFileContents =
+            getInitialMicrocontrollerProperties(qualifiedSketchName);
+        storageIo.addSourceFilesToProject(userId, projectId, false, microcontrollerFileName);
+        storageIo.uploadFileForce(projectId, microcontrollerFileName, userId,
+            microcontrollerFileContents, StorageUtil.DEFAULT_CHARSET);
+
+        String iotBlocksFileContent = getInitialIotBlocksFileContents(qualifiedSketchName);
+        storageIo.addSourceFilesToProject(userId, projectId, false, iotBlocksFileName);
+        return storageIo.uploadFileForce(projectId, iotBlocksFileName, userId,
+            iotBlocksFileContent, StorageUtil.DEFAULT_CHARSET);
       } else {
         throw new IllegalStateException("One or more files to be added already exists.");
       }

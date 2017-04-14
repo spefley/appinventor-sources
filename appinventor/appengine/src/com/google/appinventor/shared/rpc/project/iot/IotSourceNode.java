@@ -12,6 +12,7 @@ import com.google.appinventor.shared.youngandroid.YoungAndroidSourceAnalyzer;
  * @author ewpatton@mit.edu (Evan W. Patton)
  */
 public class IotSourceNode extends SourceNode {
+  private static final String NAMESPACE = "iot:";
 
   protected static final String IOT_SRC_PREFIX = YoungAndroidSourceAnalyzer.IOT_SRC_FOLDER + '/';
 
@@ -20,5 +21,25 @@ public class IotSourceNode extends SourceNode {
 
   IotSourceNode(String name, String fileId) {
     super(name, fileId);
+  }
+
+  public static String getPrefixedSketchName(String name) {
+    if (name.startsWith(NAMESPACE)) {
+      return name;
+    } else {
+      return NAMESPACE + name;
+    }
+  }
+
+  public static String getSketchDisplayName(String name) {
+    if (name.startsWith(NAMESPACE)) {
+      return name.substring(NAMESPACE.length());
+    } else {
+      return name;
+    }
+  }
+
+  public static boolean isSketch(String id) {
+    return id.startsWith(NAMESPACE);
   }
 }

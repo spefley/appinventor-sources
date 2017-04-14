@@ -104,10 +104,9 @@ public final class YoungAndroidProjectNode extends ProjectRootNode
   }
 
   public IotSourceFolderNode getIotPackageNode() {
-    IotSourceFolderNode src = null;
     for (ProjectNode child : getChildren()) {
       if (child instanceof IotSourceFolderNode) {
-        return src;
+        return (IotSourceFolderNode) child;
       }
     }
 

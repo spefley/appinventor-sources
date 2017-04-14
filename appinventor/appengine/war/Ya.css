@@ -2417,3 +2417,7 @@ textarea::-webkit-input-placeholder {
   position: absolute;
   z-index: 2000;
 }
+
+.ode-SimpleMockMicrocontroller {
+  text-align: center;
+}

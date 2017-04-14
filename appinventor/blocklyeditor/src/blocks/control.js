@@ -637,3 +637,20 @@ Blockly.Blocks['controls_closeScreenWithPlainText'] = {
   },
   typeblock: [{translatedName: Blockly.Msg.LANG_CONTROLS_CLOSE_SCREEN_WITH_PLAIN_TEXT_TITLE}]
 };
+
+Blockly.Blocks['controls_delay'] = {
+  category: 'Control',
+  helpUrl: '',
+  init: function () {
+    this.setColour(Blockly.CONTROL_CATEGORY_HUE);
+    this.appendValueInput('TIME')
+    .setCheck(Blockly.Blocks.Utilities.YailTypeToBlocklyType("text", Blockly.Blocks.Utilities.INPUT))
+    .appendField(Blockly.Msg.LANG_CONTROLS_DELAY_TITLE)
+    .appendField(Blockly.Msg.LANG_CONTROLS_DELAY_INPUT_TEXT)
+    .setAlign(Blockly.ALIGN_RIGHT);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip(Blockly.Msg.LANG_CONTROLS_DELAY_TOOLTIP);
+  },
+  typeblock: [{translatedName: Blockly.Msg.LANG_CONTROLS_DELAY_TITLE}]
+};
