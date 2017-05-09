@@ -1,0 +1,25 @@
+[{
+  "name": "Arduino Uno",
+  "memory": 1536,
+  "progMemory": 1024,
+  "digitalPins": 14,
+  "pwmPins": [3, 5, 6, 9, 10, 11],
+  "analogPins": 6,
+  "image": "images/arduino-uno.png"
+},{
+  "name": "Arduino 101",
+  "memory": 65536,
+  "progMemory": 1024,
+  "digitalPins": 14,
+  "pwmPins": [3, 5, 6, 9, 10, 11],
+  "analogPins": 6,
+  "image": "images/arduino-101.png"
+},{
+  "name": "Raspberry Pi 3",
+  "memory": 65536,
+  "progMemory": 65536,
+  "digitalPins": 0,
+  "pwmPins": [],
+  "analogPins": 0,
+  "image": "images/raspberry-pi-3.png"
+}]
