@@ -121,6 +121,7 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.appinventor.shared.rpc.project.GalleryApp;
+import com.google.appinventor.client.jseditor.JSEditorPanel;
 
 /**
  * Main entry point for Ode. Defines the startup UI elements in
@@ -235,6 +236,7 @@ public class Ode implements EntryPoint {
   private AdminUserListBox uaListBox;
   private DesignToolbar designToolbar;
   private TopToolbar topToolbar;
+  private JSEditorPanel jsEditorPanel;
 
   // Popup that indicates that an asynchronous request is pending. It is visible
   // initially, and will be hidden automatically after the first RPC completes.
@@ -924,6 +926,9 @@ public class Ode implements EntryPoint {
     VerticalPanel dVertPanel = new VerticalPanel();
     dVertPanel.setWidth("100%");
     dVertPanel.setHeight("100%");
+    jsEditorPanel = new JSEditorPanel("hi", "yup");
+    dVertPanel.add(jsEditorPanel);
+    /*
 
     // Add the Code Navigation arrow
 //    switchToBlocksButton = new VerticalPanel();
@@ -967,7 +972,7 @@ public class Ode implements EntryPoint {
     // or the blocks editor. They share the same screen real estate.
     structureAndAssets.add(SourceStructureBox.getSourceStructureBox());
     structureAndAssets.add(BlockSelectorBox.getBlockSelectorBox());  // initially not visible
-    structureAndAssets.add(AssetListBox.getAssetListBox());
+    
     workColumns.add(structureAndAssets);
 
     Box propertiesbox = PropertiesBox.getPropertiesBox();
@@ -976,6 +981,7 @@ public class Ode implements EntryPoint {
     //switchToBlocksButton.setHeight("650px");
     //workColumns.add(switchToBlocksButton);
     dVertPanel.add(workColumns);
+    */
     designTabIndex = deckPanel.getWidgetCount();
     deckPanel.add(dVertPanel);
 
