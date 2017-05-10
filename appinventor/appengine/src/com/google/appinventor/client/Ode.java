@@ -121,7 +121,7 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.appinventor.shared.rpc.project.GalleryApp;
-import com.google.appinventor.client.jseditor.JSEditorPanel;
+import com.google.appinventor.client.jseditor.JSEditorBox;
 
 /**
  * Main entry point for Ode. Defines the startup UI elements in
@@ -236,7 +236,6 @@ public class Ode implements EntryPoint {
   private AdminUserListBox uaListBox;
   private DesignToolbar designToolbar;
   private TopToolbar topToolbar;
-  private JSEditorPanel jsEditorPanel;
 
   // Popup that indicates that an asynchronous request is pending. It is visible
   // initially, and will be hidden automatically after the first RPC completes.
@@ -926,8 +925,8 @@ public class Ode implements EntryPoint {
     VerticalPanel dVertPanel = new VerticalPanel();
     dVertPanel.setWidth("100%");
     dVertPanel.setHeight("100%");
-    jsEditorPanel = new JSEditorPanel("hi", "yup");
-    dVertPanel.add(jsEditorPanel);
+    Box jsEditorBox = JSEditorBox.getJSEditorBox();
+    dVertPanel.add(jsEditorBox);
     /*
 
     // Add the Code Navigation arrow
