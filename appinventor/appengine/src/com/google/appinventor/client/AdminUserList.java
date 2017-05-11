@@ -162,7 +162,7 @@ public class AdminUserList extends Composite {
     dismissButton.addClickListener(new ClickListener() {
         @Override
         public void onClick(Widget sender) {
-          Ode.getInstance().switchToDesignView();
+          Ode.getInstance().switchToJSDesignView();
         }
       });
     panel.add(dismissButton);

@@ -50,7 +50,7 @@ public class ViewerBox extends Box {
     ProjectEditor projectEditor = Ode.getInstance().getEditorManager().openProject(projectRootNode);
     OdeLog.log("ViewerBox: switching the content in the viewer box");
     setContent(projectEditor);
-    Ode.getInstance().switchToDesignView();
+    Ode.getInstance().switchToJSDesignView();
     return projectEditor;
   }
 }

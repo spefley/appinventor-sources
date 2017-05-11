@@ -123,6 +123,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.appinventor.shared.rpc.project.GalleryApp;
 import com.google.appinventor.client.jseditor.JSEditorBox;
 
+
 /**
  * Main entry point for Ode. Defines the startup UI elements in
  * {@link #onModuleLoad()}.
@@ -199,7 +200,8 @@ public class Ode implements EntryPoint {
   private static final int PRIVATEUSERPROFILE = 5;
   private static final int MODERATIONPAGE = 6;
   private static final int USERADMIN = 7;
-  private static int currentView = DESIGNER;
+  private static final int JSDESIGNER = 8;
+  private static int currentView = JSDESIGNER;
 
   /*
    * The following fields define the general layout of the UI as seen in the following diagram:
@@ -219,6 +221,7 @@ public class Ode implements EntryPoint {
   private DeckPanel deckPanel;
   private int projectsTabIndex;
   private int designTabIndex;
+  private int jsDesignTabIndex;
   private int debuggingTabIndex;
   private int galleryTabIndex;
   private int galleryAppTabIndex;
@@ -474,6 +477,19 @@ public class Ode implements EntryPoint {
     getTopToolbar().updateFileMenuButtons(currentView);
     if (currentFileEditor != null) {
       deckPanel.showWidget(designTabIndex);
+    } else if (!editorManager.hasOpenEditor()) {  // is there a project editor pending visibility?
+      OdeLog.wlog("No current file editor to show in designer");
+      ErrorReporter.reportInfo(MESSAGES.chooseProject());
+    }
+  }
+
+  public void switchToJSDesignView() {
+    // Only show designer if there is a current editor.
+    // ***** THE DESIGNER TAB DOES NOT DISPLAY CORRECTLY IF THERE IS NO CURRENT EDITOR. *****
+    currentView = JSDESIGNER;
+    getTopToolbar().updateFileMenuButtons(currentView);
+    if (currentFileEditor != null) {
+      deckPanel.showWidget(jsDesignTabIndex);
     } else if (!editorManager.hasOpenEditor()) {  // is there a project editor pending visibility?
       OdeLog.wlog("No current file editor to show in designer");
       ErrorReporter.reportInfo(MESSAGES.chooseProject());
@@ -921,13 +937,19 @@ public class Ode implements EntryPoint {
     projectsTabIndex = deckPanel.getWidgetCount();
     deckPanel.add(pVertPanel);
 
+    // JS Design Tab
+    VerticalPanel jVertPanel = new VerticalPanel();
+    jVertPanel.setWidth("100%");
+    jVertPanel.setHeight("100%");
+    Box jsEditorBox = JSEditorBox.getJSEditorBox();
+    jVertPanel.add(jsEditorBox);
+    jsDesignTabIndex = deckPanel.getWidgetCount();
+    deckPanel.add(jVertPanel);
+
     // Design tab
     VerticalPanel dVertPanel = new VerticalPanel();
     dVertPanel.setWidth("100%");
     dVertPanel.setHeight("100%");
-    Box jsEditorBox = JSEditorBox.getJSEditorBox();
-    dVertPanel.add(jsEditorBox);
-    /*
 
     // Add the Code Navigation arrow
 //    switchToBlocksButton = new VerticalPanel();
@@ -980,7 +1002,7 @@ public class Ode implements EntryPoint {
     //switchToBlocksButton.setHeight("650px");
     //workColumns.add(switchToBlocksButton);
     dVertPanel.add(workColumns);
-    */
+
     designTabIndex = deckPanel.getWidgetCount();
     deckPanel.add(dVertPanel);
 
@@ -1045,7 +1067,7 @@ public class Ode implements EntryPoint {
         @Override
         public void onClick(ClickEvent event) {
           if (currentView == DESIGNER)
-            switchToDesignView();
+            switchToJSDesignView();
           else
             switchToProjectsView();
         }
@@ -1304,7 +1326,7 @@ public class Ode implements EntryPoint {
       return;
     }
     OdeLog.log("Ode: Setting current file editor to " + currentFileEditor.getFileId());
-    switchToDesignView();
+    switchToJSDesignView();
     if (!windowClosing) {
       userSettings.getSettings(SettingsConstants.USER_GENERAL_SETTINGS).
       changePropertyValue(SettingsConstants.GENERAL_SETTINGS_CURRENT_PROJECT_ID,
