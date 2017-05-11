@@ -121,7 +121,7 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.appinventor.shared.rpc.project.GalleryApp;
-import com.google.appinventor.client.jseditor.JSEditorBox;
+import com.google.appinventor.client.jsdesigner.JSDesignerBox;
 
 
 /**
@@ -941,8 +941,8 @@ public class Ode implements EntryPoint {
     VerticalPanel jVertPanel = new VerticalPanel();
     jVertPanel.setWidth("100%");
     jVertPanel.setHeight("100%");
-    Box jsEditorBox = JSEditorBox.getJSEditorBox();
-    jVertPanel.add(jsEditorBox);
+    Box jsDesignerBox = JSDesignerBox.getJSDesignerBox();
+    jVertPanel.add(jsDesignerBox);
     jsDesignTabIndex = deckPanel.getWidgetCount();
     deckPanel.add(jVertPanel);
 

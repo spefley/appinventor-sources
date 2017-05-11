@@ -4,7 +4,7 @@
 // Released under the Apache License, Version 2.0
 // http://www.apache.org/licenses/LICENSE-2.0
 
-package com.google.appinventor.client.jseditor;
+package com.google.appinventor.client.jsdesigner;
 
 import static com.google.appinventor.client.Ode.MESSAGES;
 import com.google.appinventor.client.widgets.boxes.Box;
@@ -13,27 +13,27 @@ import com.google.appinventor.client.widgets.boxes.Box;
  * Box implementation for source structure explorer.
  *
  */
-public final class JSEditorBox extends Box {
-    private static final JSEditorBox INSTANCE = new JSEditorBox();
+public final class JSDesignerBox extends Box {
+    private static final JSDesignerBox INSTANCE = new JSDesignerBox();
 
-    private final JSEditorPanel jsEditorPanel;
+    private final JSDesignerPanel jsDesignerPanel;
 
-    public static JSEditorBox getJSEditorBox() {
+    public static JSDesignerBox getJSDesignerBox() {
         return INSTANCE;
     }
 
-    private JSEditorBox() {
-        super(MESSAGES.jsEditorBoxCaption(),
+    private JSDesignerBox() {
+        super(MESSAGES.jsDesignerBoxCaption(),
             300,    // height
             false,  // minimizable
             false); // highlightCaption
         
-        jsEditorPanel = new JSEditorPanel("<span>HI IT'S ME SPEFLEY</span>");
+        jsDesignerPanel = new JSDesignerPanel("<span>HI IT'S ME SPEFLEY</span>");
 
-        setContent(jsEditorPanel);
+        setContent(jsDesignerPanel);
     }
 
-   public JSEditorPanel getJSEditorPanel() {
-       return jsEditorPanel;
+   public JSDesignerPanel getJSDesignerPanel() {
+       return jsDesignerPanel;
    } 
 }

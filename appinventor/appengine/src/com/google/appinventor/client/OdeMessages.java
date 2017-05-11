@@ -787,11 +787,11 @@ public interface OdeMessages extends Messages {
   @Description("Caption for palette box.")
   String paletteBoxCaption();
 
-  // Used in jsEditor/JSEditorBox.java
+  // Used in jsDesigner/JSDesignerBox.java
 
-  @DefaultMessage("JSEditor")
-  @Description("Caption for js editor box.")
-  String jsEditorBoxCaption();
+  @DefaultMessage("JSDesigner")
+  @Description("Caption for js designer box.")
+  String jsDesignerBoxCaption();
 
   // Used in boxes/ProjectListBox.java
 
