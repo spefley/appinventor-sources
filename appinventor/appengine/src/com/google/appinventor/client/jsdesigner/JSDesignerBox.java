@@ -28,7 +28,7 @@ public final class JSDesignerBox extends Box {
             false,  // minimizable
             false); // highlightCaption
         
-        jsDesignerPanel = new JSDesignerPanel("<span>HI IT'S ME SPEFLEY</span>");
+        jsDesignerPanel = new JSDesignerPanel();
 
         setContent(jsDesignerPanel);
     }

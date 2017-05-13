@@ -7,13 +7,15 @@
 package com.google.appinventor.client.jsdesigner;
 
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Element;
+import com.google.gwt.core.client.ScriptInjector;
+import com.google.gwt.user.client.Window;
+
 
 public class JSDesignerPanel extends HTMLPanel {
-  public JSDesignerPanel(String html) {
-    super(html);
-  }
-
   public JSDesignerPanel() {
-    super("<div>jsdesigner default div</div>");
+    super("<div id=\"root\"></div>");
+    ScriptInjector.fromUrl("main.9de011e5.js").inject();
   }
 }

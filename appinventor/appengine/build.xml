@@ -97,6 +97,7 @@
     <copy todir="${build.war.dir}/">
       <fileset dir="${lib.dir}">
         <include name="closure-library/**/*"/>
+        <!--<include name="main.9de011e5.js"/>-->
       </fileset>
     </copy>
   </target>
