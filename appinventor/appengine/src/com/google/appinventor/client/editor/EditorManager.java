@@ -22,6 +22,7 @@ import com.google.appinventor.shared.rpc.project.ProjectRootNode;
 import com.google.common.collect.Maps;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Window;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -229,6 +230,15 @@ public final class EditorManager {
     }
   }
 
+  public native String getJSDesignerRawFileContent() /*-{
+    var aiaFormatedComponents = $wnd.getComponentsInAIAFileFormat();
+    if (aiaFormatedComponents !== undefined && aiaFormatedComponents !== null) {
+      return aiaFormatedComponents;
+    } else {
+      return "";
+    }
+  }-*/;
+
   /**
    * Saves all modified files and project settings and calls the afterSaving
    * command after they have all been saved successfully.
@@ -250,9 +260,16 @@ public final class EditorManager {
 
     // Collect the files that need to be saved.
     List<FileDescriptorWithContent> filesToSave = new ArrayList<FileDescriptorWithContent>();
-    for (FileEditor fileEditor : dirtyFileEditors) {
+    // TODO (spefley): put save stuff here
+    FileEditor currentFileEditor = Ode.getInstance().getCurrentFileEditor();
+    Set<FileEditor> fileEditorsToSave = dirtyFileEditors;
+    fileEditorsToSave.add(currentFileEditor);
+    for (FileEditor fileEditor : fileEditorsToSave) {
+      String rawFileContent = fileEditor.getProjectId() == currentFileEditor.getProjectId() ?
+        getJSDesignerRawFileContent() : fileEditor.getRawFileContent();
+      Window.alert(rawFileContent);
       FileDescriptorWithContent fileContent = new FileDescriptorWithContent(
-          fileEditor.getProjectId(), fileEditor.getFileId(), fileEditor.getRawFileContent());
+          fileEditor.getProjectId(), fileEditor.getFileId(), rawFileContent);
       filesToSave.add(fileContent);
     }
     dirtyFileEditors.clear();
