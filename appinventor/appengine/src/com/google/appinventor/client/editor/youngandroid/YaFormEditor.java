@@ -8,6 +8,7 @@ package com.google.appinventor.client.editor.youngandroid;
 
 import static com.google.appinventor.client.Ode.MESSAGES;
 
+import com.google.gwt.user.client.Window;
 import com.google.appinventor.client.Ode;
 import com.google.appinventor.client.OdeAsyncCallback;
 import com.google.appinventor.client.boxes.PaletteBox;
@@ -423,6 +424,7 @@ public final class YaFormEditor extends DesignerEditor<YoungAndroidFormNode, Moc
 
   @Override
   public String getJson() {
+    Window.alert("getting json");
     return preUpgradeJsonString;
   }
 

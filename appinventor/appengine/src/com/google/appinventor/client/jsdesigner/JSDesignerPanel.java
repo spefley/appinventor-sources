@@ -11,11 +11,24 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.core.client.ScriptInjector;
 import com.google.gwt.user.client.Window;
+import com.google.appinventor.shared.rpc.project.ProjectRootNode;
+import com.google.appinventor.client.editor.designer.DesignerEditor;
+import com.google.appinventor.client.editor.ProjectEditor;
+import com.google.appinventor.client.editor.FileEditor;
+import com.google.appinventor.client.Ode;
 
 
 public class JSDesignerPanel extends HTMLPanel {
   public JSDesignerPanel() {
     super("<div id=\"root\"></div>");
     ScriptInjector.fromUrl("main.9de011e5.js").inject();
+  }
+
+  public void show() {
+    Ode.getInstance().switchToJSDesignView();
+  }
+
+  public void loadFile(FileEditor fileEditor) {
+    Window.alert(fileEditor.getRawFileContent());
   }
 }

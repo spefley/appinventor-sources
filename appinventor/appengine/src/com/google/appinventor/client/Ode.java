@@ -489,6 +489,7 @@ public class Ode implements EntryPoint {
     currentView = JSDESIGNER;
     getTopToolbar().updateFileMenuButtons(currentView);
     if (currentFileEditor != null) {
+      // TODO (spefley): something here?
       deckPanel.showWidget(jsDesignTabIndex);
     } else if (!editorManager.hasOpenEditor()) {  // is there a project editor pending visibility?
       OdeLog.wlog("No current file editor to show in designer");
@@ -630,6 +631,8 @@ public class Ode implements EntryPoint {
       // the project. This will cause the projects source files to be fetched
       // asynchronously, and loaded into file editors.
       ViewerBox.getViewerBox().show(projectRootNode);
+      // (spefley) file editor is not defined at this point... sigh
+      JSDesignerBox.getJSDesignerBox().getJSDesignerPanel().show();
       // Note: we can't call switchToDesignView until the Screen1 file editor
       // finishes loading. We leave that to setCurrentFileEditor(), which
       // will get called at the appropriate time.
@@ -1326,7 +1329,8 @@ public class Ode implements EntryPoint {
       return;
     }
     OdeLog.log("Ode: Setting current file editor to " + currentFileEditor.getFileId());
-    switchToJSDesignView();
+    JSDesignerBox.getJSDesignerBox().getJSDesignerPanel().loadFile(currentFileEditor);
+    switchToJSDesignView(); // TODO (spefley): interesting
     if (!windowClosing) {
       userSettings.getSettings(SettingsConstants.USER_GENERAL_SETTINGS).
       changePropertyValue(SettingsConstants.GENERAL_SETTINGS_CURRENT_PROJECT_ID,

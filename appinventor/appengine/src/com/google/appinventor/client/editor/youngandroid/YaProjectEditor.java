@@ -182,7 +182,7 @@ public final class YaProjectEditor extends ProjectEditor implements ProjectChang
       } else if (source instanceof IotBlocksNode) {
         addBlocksEditor("iot:" + ((IotBlocksNode) source).getEntityName(),
             new IotBlocksEditor(this, (IotBlocksNode) source));
-      }
+      } 
     }
     // Add the screens to the design toolbar, along with their associated editors
     DesignToolbar designToolbar = Ode.getInstance().getDesignToolbar();
@@ -461,7 +461,7 @@ public final class YaProjectEditor extends ProjectEditor implements ProjectChang
   private boolean readyToLoadProject() {
     return externalComponentsLoaded;
   }
-
+  
   private void addBlocksEditor(String entityName, final BlocksEditor<?, ?> newBlocksEditor) {
     addFileEditor(newBlocksEditor);
     OdeLog.log("Adding blocks editor for " + entityName);
