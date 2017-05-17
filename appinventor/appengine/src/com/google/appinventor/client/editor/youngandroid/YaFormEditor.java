@@ -424,7 +424,6 @@ public final class YaFormEditor extends DesignerEditor<YoungAndroidFormNode, Moc
 
   @Override
   public String getJson() {
-    Window.alert("getting json");
     return preUpgradeJsonString;
   }
 

@@ -19,6 +19,8 @@ import com.google.appinventor.client.Ode;
 
 
 public class JSDesignerPanel extends HTMLPanel {
+  private FileEditor fileEditor;
+
   public JSDesignerPanel() {
     super("<div id=\"root\"></div>");
     ScriptInjector.fromUrl("main.9de011e5.js").inject();
@@ -29,6 +31,37 @@ public class JSDesignerPanel extends HTMLPanel {
   }
 
   public void loadFile(FileEditor fileEditor) {
-    Window.alert(fileEditor.getRawFileContent());
+    this.fileEditor = fileEditor;
+    exportJSFunctions();
+    openProjectInJSDesigner(fileEditor.getRawFileContent());
+  }
+
+  public native void openProjectInJSDesigner(String rawFileContent)/*-{
+    var parsedJson = JSON.parse(rawFileContent.replace(/^\#\|\s\$JSON/, "").replace(/\|\#$/, "").replace(/\$Name/g, "name").replace(/\$Type/g, "componentType").replace(/\$Version/g, "version").replace(/\$Components/g, "children"));
+    var flattenedArray = [];
+
+    var jsonNodes = [parsedJson.Properties];
+    while(jsonNodes.length > 0) {
+      var component = Object.assign({}, jsonNodes.shift());
+      if (component.children !== undefined) {
+        jsonNodes = jsonNodes.concat(component.children);
+        component.children = component.children.map(function(child) { return child.Uuid; });
+      }
+      flattenedArray.push(component);
+    }
+    $wnd.jsDesignerLoadProject(flattenedArray);
+  }-*/;
+
+  public native void exportJSFunctions()/*-{
+    $wnd.jsDesignerToJS = {
+      getProjectJSON: $entry((this.@com.google.appinventor.client.jsdesigner.JSDesignerPanel::getProjectJSON()).bind(this))
+    };
+  }-*/;
+
+  public String getProjectJSON() {
+    if (this.fileEditor != null) {
+      return this.fileEditor.getRawFileContent();
+    }
+    return "{}";
   }
 }
